@@ -61,7 +61,7 @@ test("the app starts light, switches to dark from the sidebar, and keeps it", as
   await expect(page.getByRole("button", { name: /Delete/ }).last()).toBeVisible();
   await shot(page, "library-dark-bulk-bar");
 
-  await page.goto("/");
+  await page.goto("/create");
   await expect(page.getByRole("button", { name: "Switch light/dark theme" })).toBeVisible();
   await expect(html(page)).toHaveClass(/\bdark\b/);
   await shot(page, "create-dark");

@@ -78,7 +78,7 @@ describe("WorkflowFailure", () => {
 
   it("sends untimed transcripts back home", () => {
     renderFailure("transcript_untimed");
-    expect(screen.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/create");
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 

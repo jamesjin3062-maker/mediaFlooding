@@ -1023,11 +1023,11 @@ export default function TaskPage() {
           />
         ) : task.status === "error" && clips.length === 0 ? (
           <EmptyState tone="error" icon={<AlertCircle className="size-7" />} title={t("failedTitle")} body={t("failedBody")}>
-            <Button asChild variant="outline"><Link href="/"><ArrowLeft className="size-4" />{t("backHome")}</Link></Button>
+            <Button asChild variant="outline"><Link href="/create"><ArrowLeft className="size-4" />{t("backHome")}</Link></Button>
           </EmptyState>
         ) : clips.length === 0 ? (
           <EmptyState icon={<AlertCircle className="size-7" />} title={t("noClipsTitle")} body={t("noClipsBody")}>
-            <Button asChild><Link href="/"><ArrowLeft className="size-4" />{t("tryAnother")}</Link></Button>
+            <Button asChild><Link href="/create"><ArrowLeft className="size-4" />{t("tryAnother")}</Link></Button>
           </EmptyState>
         ) : isSeries ? (
           <SeriesView

@@ -38,7 +38,7 @@ test("full-frame framing can be selected and submitted on mobile", async ({ page
     submitted = route.request().postDataJSON();
     await route.fulfill({ json: { task_id: "one" } });
   });
-  await page.goto("/");
+  await page.goto("/create");
   await page.getByRole("button", { name: /^Settings:/ }).click();
   await page.getByRole("tab", { name: /Framing/ }).click();
   const option = page.getByRole("radio", { name: /Full frame 9:16/ });
@@ -180,7 +180,7 @@ test("font info stays open in a real selector and preserves the selected font", 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
-for (const path of ["/", "/tasks/one"]) {
+for (const path of ["/create", "/tasks/one"]) {
   test(`font info works inside caption controls at ${path}`, async ({ page }) => {
     await page.route("**/api/fonts", route => route.fulfill({ json: { fonts: [
       { name: "Inter", display_name: "Inter", scope: "system", supported_languages: ["en", "pt"] },
@@ -188,7 +188,7 @@ for (const path of ["/", "/tasks/one"]) {
     await page.route("**/api/tasks/billing-summary", route => route.fulfill({ json: { monetization_enabled: false } }));
     await page.route(/\/api\/tasks\/?(\?.*)?$/, route => route.fulfill({ json: { tasks: [] } }));
     await page.goto(path);
-    if (path === "/") {
+    if (path === "/create") {
       await page.getByRole("button", { name: /^Settings:/ }).click();
       await page.getByRole("tab", { name: /Captions/ }).click();
     } else {
@@ -269,7 +269,7 @@ for (const width of [390, 1280]) {
       submitted = route.request().postDataJSON();
       await route.fulfill({ json: { task_id: "one" } });
     });
-    await page.goto("/");
+    await page.goto("/create");
     const picker = page.getByRole("button", { name: /^Settings:/ });
     await expect(picker).toContainText("Medium (30–60s)");
     await picker.click();
@@ -297,7 +297,7 @@ for (const clipLength of ["auto", "long"]) {
     await page.route("**/api/preferences", route => route.fulfill({ json: { clipLength } }));
     // Widest composer: the server offers B-roll and it is switched on.
     await page.route("**/api/broll/status", route => route.fulfill({ json: { configured: true, provider: "pexels" } }));
-    await page.goto("/");
+    await page.goto("/create");
     await page.getByRole("button", { name: /^Settings:/ }).click();
     await page.getByRole("tab", { name: /B-roll/ }).click();
     await page.getByRole("switch", { name: "B-roll" }).click();
@@ -339,7 +339,7 @@ test("captions turn off from the caption style menu and the composer stays on on
     submitted = route.request().postDataJSON();
     await route.fulfill({ json: { task_id: "one" } });
   });
-  await page.goto("/");
+  await page.goto("/create");
   await page.getByRole("button", { name: /^Settings:/ }).click();
   await page.getByRole("tab", { name: /Captions/ }).click();
   await page.getByRole("switch", { name: "Captions", exact: true }).click();
@@ -375,7 +375,7 @@ for (const width of [390, 1280]) {
       await route.fulfill({ json: { task_id: "one" } });
     });
 
-    await page.goto("/");
+    await page.goto("/create");
     const picker = page.getByRole("radiogroup", { name: "What do you want to make?" });
     await expect(picker).toBeVisible();
     await page.getByRole("button", { name: /^Settings:/ }).click();
@@ -407,9 +407,9 @@ for (const width of [390, 1280]) {
     expect(submitted[0]?.clip_length).toBe("short");
     expect(preferenceSaved).toBe(false);
 
-    await page.goto("/?workflow=topic");
+    await page.goto("/create?workflow=topic");
     await expect(page.getByRole("radio", { name: /Topic/ })).toHaveAttribute("aria-checked", "true");
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/create$/);
     await page.getByLabel("YouTube, Twitch, or Kick URL", { exact: true }).fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
     await expect(page.getByRole("button", { name: "Find moments", exact: true })).toBeDisabled();
     await page.getByLabel("Topic", { exact: true }).fill("building a business");
@@ -434,7 +434,7 @@ test("a request pasted with the link becomes instructions and suggests the match
     submitted = route.request().postDataJSON();
     await route.fulfill({ json: { task_id: "one" } });
   });
-  await page.goto("/");
+  await page.goto("/create");
   const url = page.getByLabel("YouTube, Twitch, or Kick URL", { exact: true });
   await url.fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ make a short recap of the money advice");
   await url.blur();

@@ -25,7 +25,7 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
     await page.route("**/api/service-status/video-downloads", route => route.fulfill({ json: {
       component: { status: "operational", headline: "Resolved", description: "Downloads are working normally." },
     } }));
-    await page.goto("/");
+    await page.goto("/create");
     // The greeting also says "Up late" between midnight and 5am.
     await expect(page.getByRole("heading", { name: /^(?:Good (?:morning|afternoon|evening)|Up late), Alex$/ })).toBeVisible();
     await expect(page.getByRole("status", { name: "YouTube import status" })).toHaveCount(0);
@@ -34,7 +34,7 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
 
   test(`shows the video import incident on the ${viewport.name} generation page`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
-    await page.goto("/");
+    await page.goto("/create");
 
     const status = page.getByRole("status", { name: "YouTube import status" });
     await expect(status).toContainText("YouTube imports · Outage");

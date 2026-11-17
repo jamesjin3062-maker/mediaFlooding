@@ -224,7 +224,7 @@ export function WorkflowFailure({ code, workflow, plan, topic, sourceSeconds, ca
       <div className="mt-6 flex flex-wrap justify-center gap-2">
         {primary}
         <Button asChild variant={primary ? "ghost" : "outline"}>
-          <Link href="/"><ArrowLeft className="size-4" />{code === "transcript_untimed" ? t("workflowErrors.transcript_untimed.cta") : t("backHome")}</Link>
+          <Link href="/create"><ArrowLeft className="size-4" />{code === "transcript_untimed" ? t("workflowErrors.transcript_untimed.cta") : t("backHome")}</Link>
         </Button>
       </div>
     </div>

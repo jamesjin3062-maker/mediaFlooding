@@ -24,7 +24,7 @@ for (const width of [390, 1280]) {
       submitted = route.request().postDataJSON();
       await route.fulfill({ json: { task_id: "one" } });
     });
-    await page.goto("/");
+    await page.goto("/create");
     await page.getByRole("button", { name: /^Settings:/ }).click();
     await page.getByRole("tab", { name: /B-roll/ }).click();
     const toggle = page.getByRole("switch", { name: "B-roll" });
@@ -48,7 +48,7 @@ test("B-roll is not offered when the server has no stock footage provider", asyn
     submitted = route.request().postDataJSON();
     await route.fulfill({ json: { task_id: "one" } });
   });
-  await page.goto("/");
+  await page.goto("/create");
   await page.getByRole("button", { name: /^Settings:/ }).click();
   await expect(page.getByRole("tab", { name: /Captions/ })).toBeVisible();
   await expect(page.getByRole("tab", { name: /B-roll/ })).toHaveCount(0);

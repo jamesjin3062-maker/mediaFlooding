@@ -5,6 +5,7 @@ import { getSiteUrl } from "@/lib/site";
 const privatePaths = [
   "/api/",
   "/admin/",
+  "/create",
   "/list",
   "/settings/",
   "/tasks/",

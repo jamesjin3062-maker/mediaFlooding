@@ -644,7 +644,7 @@ describe("when workflows are enabled", () => {
     navigation.params = new URLSearchParams("workflow=trailer");
     await renderHome();
     await waitFor(() => expect(screen.getByRole("radio", { name: /Trailer/ })).toHaveAttribute("aria-checked", "true"));
-    expect(navigation.replace).toHaveBeenCalledWith("/", { scroll: false });
+    expect(navigation.replace).toHaveBeenCalledWith("/create", { scroll: false });
     expect(settingsChip()).toHaveTextContent("Auto (about 30s)");
   });
 

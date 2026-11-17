@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 type NavItem = { href: string; labelKey: "create" | "library" | "social" | "agents" | "settings"; icon: typeof Film; match: (path: string) => boolean; mobile?: boolean; social?: boolean };
 
 const NAV: NavItem[] = [
-  { href: "/", labelKey: "create", icon: Sparkles, match: (p) => p === "/" },
+  { href: "/create", labelKey: "create", icon: Sparkles, match: (p) => p === "/create" },
   { href: "/list", labelKey: "library", icon: Film, match: (p) => p.startsWith("/list") || p.startsWith("/tasks") },
   { href: "/settings/social", labelKey: "social", icon: Share2, match: (p) => p.startsWith("/settings/social"), social: true },
   // { href: "/settings/api-keys", labelKey: "agents", icon: Bot, match: (p) => p.startsWith("/settings/api-keys"), mobile: false },
@@ -47,7 +47,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("shell");
   const { data: session } = useSession();
   const pathname = usePathname();
-  const router = useRouter();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [billing] = useBillingSummary(Boolean(session?.user));
   // The editor is a full-screen workspace with its own back button: no app
@@ -62,16 +61,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         setPaletteOpen((open) => !open);
         return;
       }
-      const target = event.target as HTMLElement | null;
-      const typing = target?.closest("input, textarea, select, [contenteditable=true], [role=dialog]");
-      if (!typing && !event.metaKey && !event.ctrlKey && !event.altKey && event.key.toLowerCase() === "n") {
-        event.preventDefault();
-        router.push("/");
-      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [router]);
+  }, []);
 
   // Children must keep the same tree position whether or not the session has
   // loaded — otherwise the page remounts and re-runs its initial fetches.
@@ -98,10 +91,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Image src="/logo.png" alt="" width={24} height={24} className="size-6 dark:invert" priority />
           {!compact && "SupoClip"}
         </Link>
-
-        <SidebarLink compact={compact} href="/" label={t("nav.newGeneration")} shortcut="N" className="mb-4 mt-1 bg-foreground text-background hover:bg-foreground/90 hover:text-background">
-          <Plus className="size-4" />
-        </SidebarLink>
 
         <nav aria-label={t("search.mainNav")} className="flex w-full flex-col gap-0.5">
           {items.map((item) => {
@@ -295,9 +284,9 @@ function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (
     const q = query.trim().toLowerCase();
     const offered = availableWorkflows(workflowsInfo);
     const actions: PaletteEntry[] = [
-      { id: "new", label: t("nav.newGeneration"), hint: t("palette.newHint"), href: "/", icon: Plus },
+      { id: "new", label: t("nav.newGeneration"), hint: t("palette.newHint"), href: "/create", icon: Plus },
       ...WORKFLOW_SHORTCUTS.filter((shortcut) => offered.has(shortcut.id)).map((shortcut) => ({
-        id: `new-${shortcut.id}`, label: tHome(`palette.${shortcut.id}`), href: `/?workflow=${shortcut.id}`, icon: shortcut.icon,
+        id: `new-${shortcut.id}`, label: tHome(`palette.${shortcut.id}`), href: `/create?workflow=${shortcut.id}`, icon: shortcut.icon,
       })),
       { id: "library", label: t("palette.library"), href: "/list", icon: Film },
       ...(socialAccess === true ? [{ id: "social", label: t("palette.social"), hint: t("palette.socialHint"), href: "/settings/social", icon: Share2 }] : []),

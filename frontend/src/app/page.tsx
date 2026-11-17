@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import { HomeRouter } from "@/components/home-router";
+import LandingPage from "@/components/landing-page";
 import { getLandingFaqs } from "@/lib/landing-faq";
 import { APP_STORE_URL, COMPANY_NAME, getSiteUrl } from "@/lib/site";
 
@@ -120,7 +120,7 @@ export default async function HomePage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
         />
       ))}
-      <HomeRouter />
+      <LandingPage />
     </>
   );
 }

@@ -34,7 +34,7 @@ async function mockApp(page: Page, billing: object) {
 
 test("free users explore first and see plans when they generate", async ({ page }) => {
   await mockApp(page, free);
-  await page.goto("/");
+  await page.goto("/create");
   await expect(
     page.getByRole("main").getByText("Pick a plan to start clipping", { exact: true }),
   ).toBeVisible();
@@ -57,7 +57,7 @@ test("free users explore first and see plans when they generate", async ({ page 
 
 test("Pro users at their limit are offered Creator, not told to pay", async ({ page }) => {
   await mockApp(page, proAtLimit);
-  await page.goto("/");
+  await page.goto("/create");
   await expect(page.getByText("You've used all 10 hours of video this month")).toBeVisible();
   await expect(page.getByText(/requires a paid plan/)).toHaveCount(0);
   await page.getByRole("button", { name: "Get Creator" }).click();
@@ -74,7 +74,7 @@ test("a too-long video opens the Creator prompt instead of a dead-end error", as
     status: 422,
     json: { detail: { code: "VIDEO_TOO_LONG", message: "This video is 120.0 minutes long.", duration_seconds: 7200, max_duration_seconds: 5400 } },
   }));
-  await page.goto("/");
+  await page.goto("/create");
   await page.getByRole("textbox").first().fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
   await page.getByRole("button", { name: "Generate clips" }).click();
   await expect(page.getByRole("dialog").getByText("Creator can take this 2 h video")).toBeVisible();
@@ -118,7 +118,7 @@ test("a video longer than the minutes left says how short they are", async ({ pa
     status: 402,
     json: { detail: { code: "SUBSCRIPTION_REQUIRED", message: "This video is 45 minutes long and you have 20 minutes left this month.", billing: { ...short, upgrade_required: true, required_minutes: 45 } } },
   }));
-  await page.goto("/");
+  await page.goto("/create");
   await page.getByRole("textbox").first().fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
   await page.getByRole("button", { name: "Generate clips" }).click();
   await expect(page.getByRole("dialog").getByText("This video needs 45 minutes, and you have 20 left")).toBeVisible();
@@ -126,7 +126,7 @@ test("a video longer than the minutes left says how short they are", async ({ pa
 
 test("locked custom fonts open a font-specific prompt", async ({ page }) => {
   await mockApp(page, free);
-  await page.goto("/");
+  await page.goto("/create");
   await page.getByRole("button", { name: /^Settings:/ }).click();
   await page.getByRole("tab", { name: /Captions/ }).click();
   await page.getByRole("button", { name: /Use your own fonts/ }).click();

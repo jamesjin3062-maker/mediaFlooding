@@ -8,7 +8,7 @@ describe("postAuthPath", () => {
   it.each(["", "?next=", "?next=https://evil.example", "?next=//evil.example", "?next=/\\evil.example", "?next=settings"])(
     "falls back to home for %j",
     (search) => {
-      expect(postAuthPath(search)).toBe("/");
+      expect(postAuthPath(search)).toBe("/create");
     },
   );
 });

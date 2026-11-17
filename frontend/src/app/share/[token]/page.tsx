@@ -94,7 +94,7 @@ export default function SharedGenerationPage() {
           <Image src="/logo.png" alt="" width={22} height={22} className="size-[22px] dark:invert" priority />{t("brand")}
         </Link>
         <Button asChild size="sm" className="rounded-full">
-          <Link href="/"><Sparkles className="size-4" />{t("makeYourOwn")}</Link>
+          <Link href="/create"><Sparkles className="size-4" />{t("makeYourOwn")}</Link>
         </Button>
       </div>
     </header>
@@ -122,7 +122,7 @@ export default function SharedGenerationPage() {
           <span className="flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground"><Link2Off className="size-7" /></span>
           <h1 className="mt-4 font-display text-2xl font-bold tracking-tight">{t("unavailableTitle")}</h1>
           <p role="alert" className="mt-2 max-w-md text-sm text-muted-foreground">{error || t("unavailable")}</p>
-          <Button asChild className="mt-6"><Link href="/">{t("createOwn")}</Link></Button>
+          <Button asChild className="mt-6"><Link href="/create">{t("createOwn")}</Link></Button>
         </div>
       </main>
     );
@@ -214,7 +214,7 @@ export default function SharedGenerationPage() {
               <p className="mt-2 max-w-lg text-sm text-white/65">{t("ctaBody")}</p>
             </div>
             <Button asChild size="lg" className="shrink-0 rounded-full bg-white text-stone-950 hover:bg-white/90">
-              <Link href="/">{t("try")}<ArrowRight className="size-4" /></Link>
+              <Link href="/create">{t("try")}<ArrowRight className="size-4" /></Link>
             </Button>
           </div>
         </section>

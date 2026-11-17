@@ -223,10 +223,10 @@ export default function HomeApp() {
 
   const requestedWorkflow = searchParams.get("workflow");
   useEffect(() => {
-    // "/?workflow=series" from the command palette: pick it, then tidy the address bar.
+    // "/create?workflow=series" from the command palette: pick it, then tidy the address bar.
     if (!isWorkflow(requestedWorkflow)) return;
     setWorkflow(requestedWorkflow);
-    router.replace("/", { scroll: false });
+    router.replace("/create", { scroll: false });
   }, [requestedWorkflow, router]);
 
   useEffect(() => {
@@ -1328,7 +1328,7 @@ export default function HomeApp() {
                   <PopoverContent align="end" collisionPadding={12} className="w-[min(92vw,320px)] space-y-2 rounded-2xl text-xs text-muted-foreground">
                     <p>{t("uploadLimits", { size: formatUploadLimit(uploadLimitBytes) })}</p>
                     {limitNote && <p>{limitNote}</p>}
-                    {workflowsEnabled && <button type="button" onClick={() => window.location.assign("/?tour=workflows")} className="block font-medium text-foreground underline-offset-2 hover:underline">{t("composerSettings.tour")}</button>}
+                    {workflowsEnabled && <button type="button" onClick={() => window.location.assign("/create?tour=workflows")} className="block font-medium text-foreground underline-offset-2 hover:underline">{t("composerSettings.tour")}</button>}
                     <p>
                       {t.rich("completionEmails", {
                         settings: (chunks) => (

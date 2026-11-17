@@ -58,7 +58,7 @@ it("offers a shortcut to each workflow in the command palette", async () => {
   fireEvent.change(screen.getByRole("textbox"), { target: { value: "recap" } });
   expect(screen.getAllByRole("option")).toHaveLength(1);
   fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
-  expect(router.push).toHaveBeenCalledWith("/?workflow=recap");
+  expect(router.push).toHaveBeenCalledWith("/create?workflow=recap");
 });
 
 it("leaves the shortcuts out when workflows are not enabled", async () => {
