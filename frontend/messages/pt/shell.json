@@ -66,29 +66,5 @@
     "success": "Feedback enviado — obrigado!",
     "failed": "Não foi possível enviar o feedback",
     "error": "Algo deu errado"
-  },
-  "workspace": {
-    "dashboard": "Painel",
-    "wallet": "Carteira",
-    "campaign": "Campanha",
-    "clipper": "Clipper",
-    "accounts": "Contas",
-    "bounties": "Recompensas",
-    "adOffers": "Ofertas de anúncio",
-    "submissions": "Envios",
-    "updates": "Atualizações",
-    "announcements": "Anúncios",
-    "messages": "Mensagens",
-    "refer": "Indique e ganhe",
-    "dashboardBody": "Campanhas, envios e ganhos da sua conta de clipper.",
-    "walletBody": "Seu saldo e os pagamentos dos clipes enviados.",
-    "campaignBody": "Campanhas para recortar. Faça o short no Clipper e envie.",
-    "accountsBody": "Contas sociais quando uma campanha pede publicação.",
-    "bountiesBody": "Trabalhos pagos de recorte.",
-    "adOffersBody": "Posts pagos e ofertas de social PR.",
-    "submissionsBody": "Clipes que você enviou para campanhas.",
-    "announcementsBody": "Novidades para clippers.",
-    "messagesBody": "Mensagens de campanhas e outros clippers.",
-    "referBody": "Compartilhe seu link e ganhe quando alguém entrar."
   }
 }

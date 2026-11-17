@@ -81,26 +81,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (updatesActive) setUpdatesOpen(true); }, [updatesActive]);
 
   const topItems = [
-    { href: "/dashboard", label: t("workspace.dashboard"), icon: LayoutDashboard, match: (p: string) => p === "/dashboard" },
-    { href: "/wallet", label: t("workspace.wallet"), icon: Wallet, match: (p: string) => p.startsWith("/wallet") },
-    { href: "/campaigns", label: t("workspace.campaign"), icon: Megaphone, match: (p: string) => p.startsWith("/campaigns") },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, match: (p: string) => p === "/dashboard" },
+    { href: "/wallet", label: "Wallet", icon: Wallet, match: (p: string) => p.startsWith("/wallet") },
+    { href: "/campaigns", label: "Campaign", icon: Megaphone, match: (p: string) => p.startsWith("/campaigns") },
   ];
   const afterClipper = [
-    { href: "/accounts", label: t("workspace.accounts"), icon: Users, match: (p: string) => p.startsWith("/accounts") },
-    { href: "/bounties", label: t("workspace.bounties"), icon: Trophy, match: (p: string) => p.startsWith("/bounties") },
-    { href: "/social-pr", label: t("workspace.adOffers"), icon: BadgeDollarSign, match: (p: string) => p.startsWith("/social-pr") },
-    { href: "/submissions", label: t("workspace.submissions"), icon: Send, match: (p: string) => p.startsWith("/submissions") },
+    { href: "/accounts", label: "Accounts", icon: Users, match: (p: string) => p.startsWith("/accounts") },
+    { href: "/bounties", label: "Bounties", icon: Trophy, match: (p: string) => p.startsWith("/bounties") },
+    { href: "/social-pr", label: "Ad Offers", icon: BadgeDollarSign, match: (p: string) => p.startsWith("/social-pr") },
+    { href: "/submissions", label: "Submissions", icon: Send, match: (p: string) => p.startsWith("/submissions") },
   ];
   const updateItems = [
-    { href: "/announcements", label: t("workspace.announcements"), icon: Bell, match: (p: string) => p.startsWith("/announcements") },
-    { href: "/messages", label: t("workspace.messages"), icon: MessageSquare, match: (p: string) => p.startsWith("/messages") },
+    { href: "/announcements", label: "Announcements", icon: Bell, match: (p: string) => p.startsWith("/announcements") },
+    { href: "/messages", label: "Messages", icon: MessageSquare, match: (p: string) => p.startsWith("/messages") },
   ];
   const mobileNav = [
     ...topItems,
     ...clipperItems,
     ...afterClipper,
     ...updateItems,
-    { href: "/refer", label: t("workspace.refer"), icon: Gift, match: (p: string) => p.startsWith("/refer") },
+    { href: "/refer", label: "Refer & Earn", icon: Gift, match: (p: string) => p.startsWith("/refer") },
     ...(admin ? [{ href: "/admin", label: t("nav.admin"), icon: Shield, match: (p: string) => p.startsWith("/admin") }] : []),
   ];
 
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SidebarLink>
           ))}
 
-          <NavGroup label={t("workspace.clipper")} icon={Scissors} open={clipperOpen} onToggle={() => setClipperOpen((open) => !open)} compact={compact}>
+          <NavGroup label="Clipper" icon={Scissors} open={clipperOpen} onToggle={() => setClipperOpen((open) => !open)} compact={compact}>
             {clipperItems.map((item) => (
               <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
                 <item.icon className="size-4" />
@@ -152,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SidebarLink>
           ))}
 
-          <NavGroup label={t("workspace.updates")} icon={Bell} open={updatesOpen} onToggle={() => setUpdatesOpen((open) => !open)} compact={compact}>
+          <NavGroup label="Updates" icon={Bell} open={updatesOpen} onToggle={() => setUpdatesOpen((open) => !open)} compact={compact}>
             {updateItems.map((item) => (
               <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
                 <item.icon className="size-4" />
@@ -169,7 +169,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="mt-auto w-full space-y-2 pb-3 pt-3">
           {!compact && billing?.monetization_enabled && <UsageCard billing={billing} />}
-          <SidebarLink compact={compact} href="/refer" label={t("workspace.refer")} active={pathname.startsWith("/refer")}>
+          <SidebarLink compact={compact} href="/refer" label="Refer & Earn" active={pathname.startsWith("/refer")}>
             <Gift className="size-4" />
           </SidebarLink>
           <SidebarLink compact={compact} href="/settings" label={t("nav.settings")} active={pathname === "/settings"}>
