@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { ArrowRight, Check, Clock, Loader2, Server, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -320,12 +319,6 @@ export function UpgradeDialog({ open, onOpenChange, reason, billing, source }: U
                 <span className="text-sm font-semibold">{text.common("plans.free")}</span>
               </div>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{text.t("selfHosted.body")}</p>
-              <Link
-                href="/blog/self-host-supoclip-docker"
-                className="mt-3 inline-flex items-center gap-1 text-sm font-medium underline underline-offset-4 hover:text-muted-foreground"
-              >
-                {text.t("selfHosted.guide")} <ArrowRight className="size-3.5" />
-              </Link>
             </div>
           )}
 

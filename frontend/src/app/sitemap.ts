@@ -2,20 +2,12 @@ import type { MetadataRoute } from "next";
 
 import { blogPosts } from "@/lib/blog-posts";
 import { articleClipGalleries, getArticleClip } from "@/lib/article-clips";
-import { readChangelog } from "@/lib/changelog";
 import { DEMO_CLIPS, DEMO_PUBLISHED_AT, DEMO_SOURCE } from "@/lib/demo";
 import { seoPages } from "@/lib/seo-pages";
 import { getSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = getSiteUrl();
-  const latestChangelog = readChangelog()[0];
-  if (!latestChangelog) {
-    throw new Error("CHANGELOG.md has no dated sections");
-  }
-  const changelogUpdated = new Date(`${latestChangelog.date}T00:00:00.000Z`);
-  const currentDate = new Date("2026-07-27T00:00:00.000Z");
-  const latestBlogUpdate = new Date(Math.max(...blogPosts.map(post => new Date(`${post.updatedAt}T00:00:00.000Z`).getTime())));
 
   return [
     {
@@ -44,12 +36,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     })),
-    {
-      url: `${siteUrl}/blog`,
-      lastModified: latestBlogUpdate,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
     ...blogPosts.map((post) => ({
       url: `${siteUrl}/blog/${post.slug}`,
       images: post.image ? [`${siteUrl}${post.image.src}`] : undefined,
@@ -75,12 +61,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/changelog`,
-      lastModified: changelogUpdated,
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
       url: `${siteUrl}/affiliate`,
       lastModified: new Date("2026-10-09T00:00:00.000Z"),
       changeFrequency: "monthly",
@@ -95,18 +75,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
           publication_date: "2026-10-09",
         },
       ],
-    },
-    {
-      url: `${siteUrl}/privacy`,
-      lastModified: new Date("2026-10-05T00:00:00.000Z"),
-      changeFrequency: "yearly",
-      priority: 0.2,
-    },
-    {
-      url: `${siteUrl}/terms`,
-      lastModified: currentDate,
-      changeFrequency: "yearly",
-      priority: 0.2,
     },
   ];
 }

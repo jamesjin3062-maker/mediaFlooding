@@ -61,8 +61,7 @@ export async function ArticleShell({
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: t("shell.home"), item: siteUrl },
-          { "@type": "ListItem", position: 2, name: t("shell.blog"), item: `${siteUrl}/blog` },
-          { "@type": "ListItem", position: 3, name: breadcrumb, item: url },
+          { "@type": "ListItem", position: 2, name: breadcrumb, item: url },
         ],
       },
       {
@@ -99,14 +98,13 @@ export async function ArticleShell({
             <Image src="/logo.png" alt="" width={30} height={30} className="rounded-lg dark:invert" />SupoClip
           </Link>
           <div className="flex items-center gap-5 text-sm">
-            <Link href="/blog" className="underline underline-offset-4">{t("shell.allArticles")}</Link>
             <Link href="/sign-up" className="hidden rounded-lg bg-foreground px-4 py-2 font-semibold text-background sm:inline-flex">{t("shell.startClipping")}</Link>
           </div>
         </nav>
       </header>
       <article lang={locale} className="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-16">
         <nav aria-label={t("shell.breadcrumbNav")} className="mb-8 flex flex-wrap gap-2 text-sm text-muted-foreground">
-          <Link href="/">{t("shell.home")}</Link><span aria-hidden="true">/</span><Link href="/blog">{t("shell.blog")}</Link><span aria-hidden="true">/</span><span>{breadcrumb}</span>
+          <Link href="/">{t("shell.home")}</Link><span aria-hidden="true">/</span><span>{breadcrumb}</span>
         </nav>
         <header className="mb-10 max-w-3xl space-y-5">
           <p className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-widest">{post.eyebrow}</p>

@@ -127,8 +127,6 @@ export default async function SeoLandingPage({ params }: SeoLandingPageProps) {
             <span className="text-lg font-bold tracking-tight">SupoClip</span>
           </Link>
           <nav className="flex items-center gap-2" aria-label={t("chrome.primaryNav")}>
-            <Link href="/blog"><Button variant="ghost" size="sm">{t("chrome.blog")}</Button></Link>
-            <Link href="/blog/self-host-supoclip-docker" className="hidden sm:block"><Button variant="ghost" size="sm">{t("chrome.selfHost")}</Button></Link>
             <Link href="/sign-up"><Button size="sm">{t("chrome.startClipping")}</Button></Link>
           </nav>
         </div>

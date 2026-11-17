@@ -45,7 +45,6 @@ import {
   type BillingInterval,
 } from "@/lib/billing-plans";
 import {
-  SELF_HOSTING_GUIDE_HREF,
   getMarketingLink,
   type MarketingLink,
 } from "@/lib/marketing-links";

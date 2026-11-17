@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AlertCircle, Wrench } from "lucide-react";
 
@@ -89,10 +88,7 @@ export function VideoDownloadStatus() {
       <div className="flex items-start gap-3">
         <Icon aria-hidden="true" className={`mt-0.5 size-5 shrink-0 ${style.iconColor}`} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-            <p className="text-sm font-semibold">{t("youtube.title", { label: t(`youtube.${component.status}`) })}</p>
-            <Link href="/status" className="text-xs font-semibold underline underline-offset-2 hover:opacity-70">{t("youtube.viewStatus")}</Link>
-          </div>
+          <p className="text-sm font-semibold">{t("youtube.title", { label: t(`youtube.${component.status}`) })}</p>
           <p className="mt-2 text-sm font-semibold">{component.headline}</p>
           <p className="mt-1 text-sm leading-6 opacity-85">{component.description}</p>
         </div>

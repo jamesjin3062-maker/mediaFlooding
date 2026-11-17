@@ -102,7 +102,6 @@ export default async function FaqPage() {
         <section id="processing" aria-labelledby="processing-title" className="scroll-mt-8">
           <h2 id="processing-title" className="font-display text-3xl font-bold tracking-tight">{t("faqPage.sections.processing")}</h2>
           <Questions items={processingQuestions} />
-          <Link href="/blog/self-host-supoclip-docker" className="mt-5 inline-block text-sm font-medium underline underline-offset-4">{t("pricing.selfHostGuide")}</Link>
         </section>
         <section id="general" aria-labelledby="general-title" className="scroll-mt-8">
           <h2 id="general-title" className="font-display text-3xl font-bold tracking-tight">{t("faqPage.sections.general")}</h2>

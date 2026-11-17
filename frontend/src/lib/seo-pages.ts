@@ -80,7 +80,6 @@ export const seoPages: SeoPage[] = [
         ],
         links: [
           { href: "/youtube-shorts-clipper", label: "Step-by-step: turn a YouTube video into Shorts" },
-          { href: "/blog/self-host-supoclip-docker", label: "Run the pipeline yourself with Docker" },
         ],
       },
       {
@@ -90,7 +89,6 @@ export const seoPages: SeoPage[] = [
           "Self-hosting gives technical teams the application source and control over the processing stack. You provide compute, storage, updates, and the transcription and language-model configuration. Local Whisper and Ollama can be used, while external providers bring their own usage costs and data handling. The source is free under AGPL-3.0; managed hosting is paid. Use the real examples above to judge the output, then choose the operating model that fits how you work.",
         ],
         links: [
-          { href: "/blog/supoclip-vs-opusclip", label: "How SupoClip compares with OpusClip" },
           { href: "/open-source-video-clipper", label: "Why teams choose an open-source clipper" },
         ],
       },
@@ -162,17 +160,12 @@ export const seoPages: SeoPage[] = [
           "Configure access, protect secrets, and maintain the deployed application",
           "Check jobs, provider usage, and output quality as your workload changes",
         ],
-        links: [{ href: "/blog/self-host-supoclip-docker", label: "Production checklist in the self-hosting guide" }],
       },
       {
         heading: "Choose a complete app or integrate a smaller tool",
         paragraphs: [
           "If you need an interface for reviewing clips, timing captions, and correcting crops, evaluate the complete SupoClip app. If you are building a custom processing service, a library may be a better starting point. Automatic silence removal is another distinct editing job; it does not by itself decide which story or explanation makes a good social clip. Compare tools against the task you need to finish instead of assuming every open-source video project replaces the same workflow.",
           "Test a recording you have permission to use and know well. Check complete thoughts, speaker changes, proper nouns, visual context, and final exports. Record setup effort separately from processing time, and include human review and provider costs in your decision. You can use paid hosted SupoClip to focus on creating clips or self-host to control the application and its configuration. Both routes benefit from checking the real output before adopting a repeatable workflow.",
-        ],
-        links: [
-          { href: "/blog/self-host-supoclip-docker", label: "Self-host SupoClip with Docker Compose" },
-          { href: "/blog/supoclip-vs-opusclip", label: "Self-hosted SupoClip vs hosted OpusClip" },
         ],
       },
     ],
@@ -246,7 +239,6 @@ export const seoPages: SeoPage[] = [
           "Choose the YouTube Shorts export preset and render the finished video. Watch the exported file with audio, then once without sound to check that the captions and framing carry the idea. Write a title that describes what the viewer will learn. When YouTube publishing is enabled for your account, Pro supports posting immediately and Creator adds scheduled posting. Availability also depends on the deployment’s social integration; exporting remains a separate workflow.",
           "Keep the original episode link and source timestamp with each clip. Publish distinct takeaways rather than multiple cuts that repeat the same answer. For a weekly batch, finish editorial review before filling the calendar, then confirm that scheduled posts actually appear on the intended channel. Use real audience viewing and responses to choose the next topics. SupoClip’s selection scores help prioritize review; they do not guarantee reach, and no recording is guaranteed to produce a fixed number of useful Shorts.",
         ],
-        links: [{ href: "/blog/supoclip-vs-opusclip", label: "Choosing between SupoClip and OpusClip" }],
       },
     ],
     faqs: [

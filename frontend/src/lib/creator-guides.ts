@@ -312,7 +312,7 @@ export const creatorGuides: CreatorGuide[] = [
       {
         id: "supoclip", heading: "SupoClip: a clipping workflow with an interface",
         paragraphs: ["SupoClip accepts supported source links and uploaded video, proposes segments from speech, and gives you an editor for cuts, captions, framing, and exports. You can use the paid hosted service or run the application yourself under AGPL-3.0. The public demo shows actual generated clips with linked source moments.", "Self-hosting means operating the application, worker, database, media storage, and your chosen transcription and model providers. A local Whisper and Ollama configuration is available; using external providers changes where data is processed and what usage costs you incur. Choose the hosted service if your main goal is publishing rather than maintaining that stack."],
-        links: [{ href: "/demo", label: "Inspect real SupoClip output" }, { href: "/blog/self-host-supoclip-docker", label: "Read the setup requirements" }],
+        links: [{ href: "/demo", label: "Inspect real SupoClip output" }],
       },
       {
         id: "alternatives", heading: "Clips AI and Auto-Editor: building blocks for different jobs",
@@ -332,7 +332,7 @@ export const creatorGuides: CreatorGuide[] = [
       { question: "Were all three tools tested on the same video?", answer: "No. This comparison uses official documentation and SupoClip's own implementation and demo. Use the test checklist to evaluate output on your recording; no cross-tool benchmark results are claimed here." },
     ],
     cta: { title: "Try the complete SupoClip workflow", body: "Use the paid hosted app to start with a recording, or follow the self-hosting guide if you want to operate the application yourself.", label: "Start with SupoClip" },
-    related: ["/open-source-video-clipper", "/blog/self-host-supoclip-docker", "/blog/supoclip-vs-opusclip"],
+    related: ["/open-source-video-clipper", "/demo", "/ai-video-clipper"],
   },
 ];
 

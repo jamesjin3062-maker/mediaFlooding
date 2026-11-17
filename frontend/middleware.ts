@@ -5,14 +5,16 @@ const PUBLIC_FILE = /\.(.*)$/;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const removedBlogPosts = new Set([
+    "/blog/tiktok-publishing-is-live",
+    "/blog/supoclip-vs-supo-live",
+    "/blog/supoclip-vs-opusclip",
+    "/blog/self-host-supoclip-docker",
+    "/blog/best-free-opusclip-alternative",
+  ]);
   const hidden =
     pathname === "/faq" ||
-    pathname === "/privacy" ||
-    pathname === "/terms" ||
-    pathname === "/changelog" ||
-    pathname === "/status" ||
-    pathname === "/blog" ||
-    pathname.startsWith("/blog/");
+    (pathname.startsWith("/blog/") && !removedBlogPosts.has(pathname));
   if (hidden) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
@@ -29,7 +31,6 @@ export function middleware(request: NextRequest) {
 
   if (
     pathname === "/" ||
-    pathname === "/status" ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/billing/webhook") ||
     pathname.startsWith("/ingest/") ||

@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { intlLocale } from "@/i18n/config";
 import { DEMO_CLIPS, DEMO_PUBLISHED_AT, DEMO_SOURCE, getDemoSourceMomentUrl } from "@/lib/demo";
-import { SELF_HOSTING_GUIDE_HREF } from "@/lib/marketing-links";
 import { GITHUB_URL, getSiteUrl } from "@/lib/site";
 
 const pipelineIcons = [Type, Sparkles, Captions, ScanFace];
