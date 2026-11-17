@@ -66,5 +66,29 @@
     "success": "反馈已提交 — 谢谢！",
     "failed": "反馈提交失败",
     "error": "出了点问题"
+  },
+  "workspace": {
+    "dashboard": "仪表盘",
+    "wallet": "钱包",
+    "campaign": "活动",
+    "clipper": "Clipper",
+    "accounts": "账号",
+    "bounties": "赏金",
+    "adOffers": "广告邀约",
+    "submissions": "投稿",
+    "updates": "动态",
+    "announcements": "公告",
+    "messages": "消息",
+    "refer": "推荐有奖",
+    "dashboardBody": "剪辑账号的活动、投稿和收入。",
+    "walletBody": "投稿片段的余额和提现。",
+    "campaignBody": "可投稿的活动。在 Clipper 里剪短视频，然后提交。",
+    "accountsBody": "活动要求发布时使用的社交账号。",
+    "bountiesBody": "付费剪辑任务。",
+    "adOffersBody": "付费发布和社交推广邀约。",
+    "submissionsBody": "你已提交到活动的片段。",
+    "announcementsBody": "给剪辑者的消息。",
+    "messagesBody": "来自活动和其他剪辑者的消息。",
+    "referBody": "分享你的链接，有人加入即可获得奖励。"
   }
 }

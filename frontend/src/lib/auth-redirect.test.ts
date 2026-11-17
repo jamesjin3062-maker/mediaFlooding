@@ -11,6 +11,11 @@ describe("postAuthPath", () => {
       expect(postAuthPath(search)).toBe("/create");
     },
   );
+
+  it("uses the sign-up fallback when no safe next path is present", () => {
+    expect(postAuthPath("", "/dashboard")).toBe("/dashboard");
+    expect(postAuthPath("?next=/wallet", "/dashboard")).toBe("/wallet");
+  });
 });
 
 describe("signInPath", () => {

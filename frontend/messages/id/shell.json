@@ -66,5 +66,29 @@
     "success": "Masukan terkirim — terima kasih!",
     "failed": "Masukan gagal dikirim",
     "error": "Ada yang tidak beres"
+  },
+  "workspace": {
+    "dashboard": "Dasbor",
+    "wallet": "Dompet",
+    "campaign": "Kampanye",
+    "clipper": "Clipper",
+    "accounts": "Akun",
+    "bounties": "Bounty",
+    "adOffers": "Penawaran iklan",
+    "submissions": "Kiriman",
+    "updates": "Pembaruan",
+    "announcements": "Pengumuman",
+    "messages": "Pesan",
+    "refer": "Ajak & dapatkan",
+    "dashboardBody": "Kampanye, kiriman, dan penghasilan akun clipper kamu.",
+    "walletBody": "Saldo dan pembayaran dari klip yang kamu kirim.",
+    "campaignBody": "Kampanye untuk dipotong. Buat short di Clipper, lalu kirim.",
+    "accountsBody": "Akun sosial saat kampanye meminta unggahan.",
+    "bountiesBody": "Pekerjaan clipping berbayar.",
+    "adOffersBody": "Postingan berbayar dan penawaran social PR.",
+    "submissionsBody": "Klip yang sudah kamu kirim ke kampanye.",
+    "announcementsBody": "Berita untuk clipper.",
+    "messagesBody": "Pesan dari kampanye dan clipper lain.",
+    "referBody": "Bagikan tautanmu dan dapatkan saat seseorang bergabung."
   }
 }

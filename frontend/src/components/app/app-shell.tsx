@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowRight, CornerDownLeft, Film, ListChecks, ListOrdered, LogOut, Play, Plus, Search, Settings, Share2, Shield, Sparkles, Target,
+  ArrowRight, BadgeDollarSign, Bell, ChevronRight, CornerDownLeft, Film, Gift, LayoutDashboard, ListChecks, ListOrdered, LogOut, Megaphone, MessageSquare, Play, Plus, Scissors, Search, Send, Settings, Share2, Shield, Sparkles, Target, Trophy, Users, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -72,10 +72,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useAppTheme(Boolean(user));
   const admin = Boolean((user as { is_admin?: boolean } | undefined)?.is_admin);
   const socialAccess = useSocialAccess(Boolean(user));
-  const labeled = NAV.map((item) => ({ ...item, label: t(`nav.${item.labelKey}`) }));
-  const nav = labeled.filter((item) => !item.social || socialAccess === true);
-  const mobileNav = nav.filter((item) => item.mobile !== false);
-  const items = admin ? [...nav, { href: "/admin", label: t("nav.admin"), icon: Shield, match: (p: string) => p.startsWith("/admin") }] : nav;
+  const clipperItems = NAV.map((item) => ({ ...item, label: t(`nav.${item.labelKey}`) })).filter((item) => !item.social || socialAccess === true);
+  const clipperActive = clipperItems.some((item) => item.match(pathname));
+  const updatesActive = pathname.startsWith("/announcements") || pathname.startsWith("/messages");
+  const [clipperOpen, setClipperOpen] = useState(true);
+  const [updatesOpen, setUpdatesOpen] = useState(false);
+  useEffect(() => { if (clipperActive) setClipperOpen(true); }, [clipperActive]);
+  useEffect(() => { if (updatesActive) setUpdatesOpen(true); }, [updatesActive]);
+
+  const topItems = [
+    { href: "/dashboard", label: t("workspace.dashboard"), icon: LayoutDashboard, match: (p: string) => p === "/dashboard" },
+    { href: "/wallet", label: t("workspace.wallet"), icon: Wallet, match: (p: string) => p.startsWith("/wallet") },
+    { href: "/campaigns", label: t("workspace.campaign"), icon: Megaphone, match: (p: string) => p.startsWith("/campaigns") },
+  ];
+  const afterClipper = [
+    { href: "/accounts", label: t("workspace.accounts"), icon: Users, match: (p: string) => p.startsWith("/accounts") },
+    { href: "/bounties", label: t("workspace.bounties"), icon: Trophy, match: (p: string) => p.startsWith("/bounties") },
+    { href: "/social-pr", label: t("workspace.adOffers"), icon: BadgeDollarSign, match: (p: string) => p.startsWith("/social-pr") },
+    { href: "/submissions", label: t("workspace.submissions"), icon: Send, match: (p: string) => p.startsWith("/submissions") },
+  ];
+  const updateItems = [
+    { href: "/announcements", label: t("workspace.announcements"), icon: Bell, match: (p: string) => p.startsWith("/announcements") },
+    { href: "/messages", label: t("workspace.messages"), icon: MessageSquare, match: (p: string) => p.startsWith("/messages") },
+  ];
+  const mobileNav = [
+    ...topItems,
+    ...clipperItems,
+    ...afterClipper,
+    ...updateItems,
+    { href: "/refer", label: t("workspace.refer"), icon: Gift, match: (p: string) => p.startsWith("/refer") },
+    ...(admin ? [{ href: "/admin", label: t("nav.admin"), icon: Shield, match: (p: string) => p.startsWith("/admin") }] : []),
+  ];
 
   return (
     <div data-app-shell={user ? "" : undefined} className={cn(user && "flex min-h-dvh bg-canvas")}>
@@ -92,33 +119,62 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {!compact && "SupoClip"}
         </Link>
 
-        <nav aria-label={t("search.mainNav")} className="flex w-full flex-col gap-0.5">
-          {items.map((item) => {
-            const active = item.match(pathname);
-            return (
-              <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={active}>
+        <nav aria-label={t("search.mainNav")} className="flex min-h-0 w-full flex-1 flex-col gap-0.5 overflow-y-auto">
+          {topItems.map((item) => (
+            <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
+              <item.icon className="size-4" />
+            </SidebarLink>
+          ))}
+
+          <NavGroup label={t("workspace.clipper")} icon={Scissors} open={clipperOpen} onToggle={() => setClipperOpen((open) => !open)} compact={compact}>
+            {clipperItems.map((item) => (
+              <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
                 <item.icon className="size-4" />
               </SidebarLink>
-            );
-          })}
+            ))}
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className={cn(
+                "flex h-9 w-full items-center gap-2 rounded-lg border border-sidebar-border bg-background text-sm text-muted-foreground transition-colors hover:text-foreground",
+                compact ? "justify-center px-0" : "px-2.5",
+              )}
+              aria-label={t("search.generations")}
+            >
+              <Search className="size-4 shrink-0" />
+              {!compact && <><span className="flex-1 text-left">{t("search.label")}</span><Kbd>⌘K</Kbd></>}
+            </button>
+          </NavGroup>
+
+          {afterClipper.map((item) => (
+            <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
+              <item.icon className="size-4" />
+            </SidebarLink>
+          ))}
+
+          <NavGroup label={t("workspace.updates")} icon={Bell} open={updatesOpen} onToggle={() => setUpdatesOpen((open) => !open)} compact={compact}>
+            {updateItems.map((item) => (
+              <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
+                <item.icon className="size-4" />
+              </SidebarLink>
+            ))}
+          </NavGroup>
+
+          {admin ? (
+            <SidebarLink compact={compact} href="/admin" label={t("nav.admin")} active={pathname.startsWith("/admin")}>
+              <Shield className="size-4" />
+            </SidebarLink>
+          ) : null}
         </nav>
 
-        <button
-          type="button"
-          onClick={() => setPaletteOpen(true)}
-          className={cn(
-            "mt-4 flex h-9 w-full items-center gap-2 rounded-lg border border-sidebar-border bg-background text-sm text-muted-foreground transition-colors hover:text-foreground",
-            compact ? "justify-center px-0" : "px-2.5",
-          )}
-          aria-label={t("search.generations")}
-        >
-          <Search className="size-4 shrink-0" />
-          {!compact && <><span className="flex-1 text-left">{t("search.label")}</span><Kbd>⌘K</Kbd></>}
-        </button>
-
-        <div className="mt-auto w-full space-y-2 pb-3">
-          {/* <Announcements key={user.id} userId={user.id} compact={compact} className="w-full" /> */}
+        <div className="mt-auto w-full space-y-2 pb-3 pt-3">
           {!compact && billing?.monetization_enabled && <UsageCard billing={billing} />}
+          <SidebarLink compact={compact} href="/refer" label={t("workspace.refer")} active={pathname.startsWith("/refer")}>
+            <Gift className="size-4" />
+          </SidebarLink>
+          <SidebarLink compact={compact} href="/settings" label={t("nav.settings")} active={pathname === "/settings"}>
+            <Settings className="size-4" />
+          </SidebarLink>
           <UserRow compact={compact} name={user.name} email={user.email} />
         </div>
       </aside> : null}
@@ -140,12 +196,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </div>
 
-      {user && !immersive ? <nav aria-label={t("search.mobileNav")} style={{ gridTemplateColumns: `repeat(${mobileNav.length}, minmax(0, 1fr))` }} className="fixed inset-x-0 bottom-0 z-40 grid border-t bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      {user && !immersive ? <nav aria-label={t("search.mobileNav")} className="fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         {mobileNav.map((item) => {
           const active = item.match(pathname);
           return (
             <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
-              className={cn("flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium", active ? "text-foreground" : "text-muted-foreground")}>
+              className={cn("flex h-16 min-w-[4.5rem] shrink-0 flex-col items-center justify-center gap-1 px-2 text-[11px] font-medium", active ? "text-foreground" : "text-muted-foreground")}>
               <item.icon className={cn("size-5", active && "text-brand")} />{item.label}
             </Link>
           );
@@ -153,6 +209,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav> : null}
 
       {user ? <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} /> : null}
+    </div>
+  );
+}
+
+function NavGroup({ label, icon: Icon, open, onToggle, compact, children }: {
+  label: string; icon: typeof Film; open: boolean; onToggle: () => void; compact: boolean; children: React.ReactNode;
+}) {
+  if (compact) return <div className="flex w-full flex-col gap-0.5">{children}</div>;
+  return (
+    <div className="flex w-full flex-col gap-0.5">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={onToggle}
+        className="flex h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+      >
+        <Icon className="size-4 shrink-0" />
+        <span className="flex-1 text-left">{label}</span>
+        <ChevronRight className={cn("size-4 shrink-0 transition-transform", open && "rotate-90")} />
+      </button>
+      {open ? <div className="ml-3.5 flex flex-col gap-0.5 border-l border-sidebar-border pl-2">{children}</div> : null}
     </div>
   );
 }

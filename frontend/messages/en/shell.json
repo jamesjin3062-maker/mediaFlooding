@@ -66,5 +66,29 @@
     "success": "Feedback submitted — thank you!",
     "failed": "Failed to submit feedback",
     "error": "Something went wrong"
+  },
+  "workspace": {
+    "dashboard": "Dashboard",
+    "wallet": "Wallet",
+    "campaign": "Campaign",
+    "clipper": "Clipper",
+    "accounts": "Accounts",
+    "bounties": "Bounties",
+    "adOffers": "Ad Offers",
+    "submissions": "Submissions",
+    "updates": "Updates",
+    "announcements": "Announcements",
+    "messages": "Messages",
+    "refer": "Refer & Earn",
+    "dashboardBody": "Campaigns, submissions, and earnings for your clipper account.",
+    "walletBody": "Your balance and payouts from submitted clips.",
+    "campaignBody": "Campaigns to clip for. Make the short in Clipper, then submit it.",
+    "accountsBody": "Social accounts used when a campaign asks you to post.",
+    "bountiesBody": "Paid clipping jobs you can take.",
+    "adOffersBody": "Paid posts and social PR offers.",
+    "submissionsBody": "Clips you have submitted to campaigns.",
+    "announcementsBody": "News and updates for clippers.",
+    "messagesBody": "Messages from campaigns and other clippers.",
+    "referBody": "Share your link and earn when someone joins."
   }
 }

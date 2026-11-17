@@ -66,5 +66,29 @@
     "success": "Feedback gesendet — danke!",
     "failed": "Feedback konnte nicht gesendet werden",
     "error": "Etwas ist schiefgelaufen"
+  },
+  "workspace": {
+    "dashboard": "Dashboard",
+    "wallet": "Wallet",
+    "campaign": "Kampagne",
+    "clipper": "Clipper",
+    "accounts": "Konten",
+    "bounties": "Bounties",
+    "adOffers": "Anzeigenangebote",
+    "submissions": "Einreichungen",
+    "updates": "Updates",
+    "announcements": "Ankündigungen",
+    "messages": "Nachrichten",
+    "refer": "Empfehlen & verdienen",
+    "dashboardBody": "Kampagnen, Einreichungen und Einnahmen für dein Clipper-Konto.",
+    "walletBody": "Dein Guthaben und Auszahlungen aus eingereichten Clips.",
+    "campaignBody": "Kampagnen zum Clipsen. Schneide den Short in Clipper und reiche ihn ein.",
+    "accountsBody": "Social-Konten, wenn eine Kampagne einen Post verlangt.",
+    "bountiesBody": "Bezahlte Clipping-Aufträge.",
+    "adOffersBody": "Bezahlte Posts und Social-PR-Angebote.",
+    "submissionsBody": "Clips, die du bei Kampagnen eingereicht hast.",
+    "announcementsBody": "Neuigkeiten für Clipper.",
+    "messagesBody": "Nachrichten von Kampagnen und anderen Clippern.",
+    "referBody": "Teile deinen Link und verdiene, wenn jemand beitritt."
   }
 }
