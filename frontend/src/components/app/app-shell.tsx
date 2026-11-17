@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowRight, Bot, ChartColumn, CornerDownLeft, Film, ListChecks, ListOrdered, LogOut, Play, Plus, Search, Settings, Share2, Shield, Sparkles, Target,
+  ArrowRight, ChartColumn, CornerDownLeft, Film, ListChecks, ListOrdered, LogOut, Play, Plus, Search, Settings, Share2, Shield, Sparkles, Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -17,7 +17,6 @@ import { billingPlanMessageKey } from "@/lib/billing-plans";
 import { getUpgradeState } from "@/components/billing/upgrade-prompt";
 import { fetchGenerations, timeAgo, type GenerationSummary } from "@/lib/generations";
 import { StatusBadge } from "@/components/app/status-badge";
-import { Announcements } from "@/components/announcements";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppTheme } from "@/components/theme-provider";
 import { availableWorkflows, useWorkflowsInfo } from "@/components/workflow-picker";
