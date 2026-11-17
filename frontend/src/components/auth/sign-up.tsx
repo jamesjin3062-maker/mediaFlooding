@@ -46,7 +46,7 @@ export function SignUp() {
 
     // Automatically sign in after successful sign up
     setTimeout(() => {
-      window.location.href = postAuthPath(window.location.search, "/dashboard");
+      window.location.href = postAuthPath(window.location.search);
     }, 1000);
   };
 

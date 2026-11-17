@@ -136,7 +136,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               type="button"
               onClick={() => setPaletteOpen(true)}
               className={cn(
-                "flex h-9 w-full items-center gap-2 rounded-lg border border-sidebar-border bg-background text-sm text-muted-foreground transition-colors hover:text-foreground",
+                "flex h-9 w-full items-center gap-2.5 rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground",
                 compact ? "justify-center px-0" : "px-2.5",
               )}
               aria-label={t("search.generations")}

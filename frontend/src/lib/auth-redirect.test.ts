@@ -8,14 +8,9 @@ describe("postAuthPath", () => {
   it.each(["", "?next=", "?next=https://evil.example", "?next=//evil.example", "?next=/\\evil.example", "?next=settings"])(
     "falls back to home for %j",
     (search) => {
-      expect(postAuthPath(search)).toBe("/create");
+      expect(postAuthPath(search)).toBe("/dashboard");
     },
   );
-
-  it("uses the sign-up fallback when no safe next path is present", () => {
-    expect(postAuthPath("", "/dashboard")).toBe("/dashboard");
-    expect(postAuthPath("?next=/wallet", "/dashboard")).toBe("/wallet");
-  });
 });
 
 describe("signInPath", () => {
