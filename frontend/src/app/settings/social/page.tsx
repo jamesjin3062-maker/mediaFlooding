@@ -349,19 +349,6 @@ function SocialSettingsContent() {
 
       {/* Scheduled */}
       {!isFetching && connections.length > 0 && <ScheduledPosts sectionHeadingClassName={SECTION_HEADING} />}
-
-      <Link
-        href="/analytics"
-        className="group flex items-center justify-between gap-4 rounded-xl border bg-background p-4 text-sm transition-colors hover:border-foreground/25"
-      >
-        <span>
-          <span className="block font-medium">{t("page.analytics")}</span>
-          <span className="block text-xs text-muted-foreground">
-            {t("page.analyticsHint")}
-          </span>
-        </span>
-        <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-      </Link>
     </main>
   );
 }

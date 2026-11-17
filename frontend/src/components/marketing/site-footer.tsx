@@ -32,8 +32,6 @@ export function SiteFooter() {
         ...getMarketingLinks("product").map((link) => link.href),
         "/sign-up",
         "/#pricing",
-        // "/faq",
-        "/affiliate",
         // "/changelog",
         // "/status",
         // "/privacy",
@@ -64,7 +62,7 @@ export function SiteFooter() {
             <span>&copy; {new Date().getFullYear()} {COMPANY_NAME}</span>
           </div>
         </div>
-        {columns.map((column) => (
+        {columns.filter((column) => column.hrefs.length > 0).map((column) => (
           <nav key={column.id} aria-label={t("footer.columnLinks", { heading: column.heading })}>
             <p className="text-sm font-medium">{column.heading}</p>
             <ul className="mt-4 space-y-2.5 text-xs text-muted-foreground">

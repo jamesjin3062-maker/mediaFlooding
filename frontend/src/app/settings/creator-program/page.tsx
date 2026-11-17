@@ -182,8 +182,7 @@ export default function CreatorProgramPage() {
         <p className="mt-2 text-muted-foreground">
           {t.rich("creator.intro", {
             em: (chunks) => <span className="font-medium text-foreground">{chunks}</span>,
-          })}{" "}
-          <Link href="/affiliate" className="underline underline-offset-4 hover:text-foreground">{t("creator.howItWorks")}</Link>
+          })}
         </p>
       </div>
 

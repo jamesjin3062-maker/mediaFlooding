@@ -1,6 +1,6 @@
 /**
- * Single registry of indexable marketing pages. The landing page, footer,
- * SEO pages, and blog all link from here so new pages are never orphaned.
+ * Single registry of indexable marketing pages. The landing page and footer
+ * link from here so new pages are never orphaned.
  */
 export type MarketingLinkGroup = "product" | "guide" | "comparison";
 
@@ -26,76 +26,7 @@ export const marketingLinks: MarketingLink[] = [
     title: "See real clips SupoClip made from a long video",
     label: "Demo",
     description: "Watch the output, then jump to each moment in the original source video.",
-    related: ["/ai-video-clipper", "/youtube-shorts-clipper", "/open-source-video-clipper"],
-  },
-  {
-    href: "/ai-video-clipper",
-    group: "guide",
-    eyebrow: "AI Video Clipping",
-    title: "AI video clipper for Shorts, Reels, and TikTok",
-    label: "AI video clipper",
-    description: "How SupoClip finds moments, scores candidates, reframes faces, and adds captions.",
-    related: ["/blog/find-best-moments-in-video", "/blog/podcast-to-shorts", "/youtube-shorts-clipper"],
-  },
-  {
-    href: "/youtube-shorts-clipper",
-    group: "guide",
-    eyebrow: "YouTube to Shorts",
-    title: "Repurpose long YouTube videos into Shorts",
-    label: "YouTube Shorts clipper",
-    description: "A practical workflow for selecting, captioning, reframing, and reviewing clips.",
-    related: ["/demo", "/blog/schedule-week-of-youtube-shorts", "/blog/word-by-word-video-captions"],
-  },
-  {
-    href: "/open-source-video-clipper",
-    group: "guide",
-    eyebrow: "Open Source",
-    title: "Open-source video clipper you can control",
-    label: "Open-source clipper",
-    description: "What self-hosting changes about control, model providers, and infrastructure.",
-    related: ["/blog/open-source-video-clippers", "/demo", "/ai-video-clipper"],
-  },
-  {
-    href: "/blog/podcast-to-shorts", language: "en", group: "guide", eyebrow: "Podcast clips",
-    title: "Turn a video podcast into Shorts and Reels", label: "Podcast to Shorts",
-    description: "Choose complete ideas, correct captions, and follow real clips back to the source.",
-    related: ["/ai-video-clipper", "/blog/word-by-word-video-captions", "/youtube-shorts-clipper"],
-  },
-  {
-    href: "/blog/find-best-moments-in-video", language: "en", group: "guide", eyebrow: "Highlight selection",
-    title: "Find the best moments in a long video", label: "Find video highlights",
-    description: "Use a practical checklist for hooks, context, payoff, and clean boundaries.",
-    related: ["/blog/podcast-to-shorts", "/blog/repurpose-webinar-clips", "/ai-video-clipper"],
-  },
-  {
-    href: "/blog/twitch-vod-to-shorts", language: "en", group: "guide", eyebrow: "Stream clips",
-    title: "Turn Twitch VODs into TikTok clips and Shorts", label: "Twitch VOD to Shorts",
-    description: "Review spoken highlights, preserve gameplay context, and export vertical clips.",
-    related: ["/blog/find-best-moments-in-video", "/blog/word-by-word-video-captions", "/youtube-shorts-clipper"],
-  },
-  {
-    href: "/blog/repurpose-webinar-clips", language: "en", group: "guide", eyebrow: "Webinar repurposing",
-    title: "Repurpose a webinar into social media clips", label: "Webinar clips",
-    description: "Turn audience questions and useful answers into clips with readable slides and captions.",
-    related: ["/blog/find-best-moments-in-video", "/blog/word-by-word-video-captions", "/blog/schedule-week-of-youtube-shorts"],
-  },
-  {
-    href: "/blog/word-by-word-video-captions", language: "en", group: "guide", eyebrow: "Caption editing",
-    title: "Add readable word-by-word captions to clips", label: "Word-by-word captions",
-    description: "Correct the transcript, choose a style, and keep subtitles clear of platform controls.",
-    related: ["/blog/podcast-to-shorts", "/blog/twitch-vod-to-shorts", "/blog/repurpose-webinar-clips"],
-  },
-  {
-    href: "/blog/schedule-week-of-youtube-shorts", language: "en", group: "guide", eyebrow: "Publishing workflow",
-    title: "Create and schedule a week of YouTube Shorts", label: "Schedule YouTube Shorts",
-    description: "Build a distinct batch, review each clip, and verify scheduled publication.",
-    related: ["/blog/podcast-to-shorts", "/youtube-shorts-clipper", "/blog/repurpose-webinar-clips"],
-  },
-  {
-    href: "/blog/open-source-video-clippers", language: "en", group: "comparison", eyebrow: "Open-source comparison",
-    title: "Compare SupoClip, Clips AI, and Auto-Editor", label: "Open-source video clippers",
-    description: "Choose an app, Python library, or command-line tool for the editing job you need.",
-    related: ["/open-source-video-clipper", "/demo", "/ai-video-clipper"],
+    related: [],
   },
 ];
 

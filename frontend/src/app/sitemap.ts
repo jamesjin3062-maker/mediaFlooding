@@ -1,9 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { blogPosts } from "@/lib/blog-posts";
-import { articleClipGalleries, getArticleClip } from "@/lib/article-clips";
 import { DEMO_CLIPS, DEMO_PUBLISHED_AT, DEMO_SOURCE } from "@/lib/demo";
-import { seoPages } from "@/lib/seo-pages";
 import { getSiteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -29,52 +26,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         duration: clip.previewSeconds,
         publication_date: DEMO_PUBLISHED_AT,
       })),
-    },
-    ...seoPages.map((page) => ({
-      url: `${siteUrl}/${page.slug}`,
-      lastModified: new Date(`${page.updatedAt}T00:00:00.000Z`),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    })),
-    ...blogPosts.map((post) => ({
-      url: `${siteUrl}/blog/${post.slug}`,
-      images: post.image ? [`${siteUrl}${post.image.src}`] : undefined,
-      videos: articleClipGalleries[post.slug]?.examples.flatMap(({ clipId }) => {
-        const clip = getArticleClip(clipId);
-        return clip ? [{
-          title: clip.title,
-          description: `SupoClip excerpt from ${clip.source.title}. ${clip.edits}`,
-          thumbnail_loc: `${siteUrl}${clip.poster}`,
-          content_loc: `${siteUrl}${clip.src}`,
-          duration: Math.round(clip.durationSeconds),
-          publication_date: clip.publishedAt,
-        }] : [];
-      }),
-      lastModified: new Date(`${post.updatedAt}T00:00:00.000Z`),
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    })),
-    {
-      url: `${siteUrl}/faq`,
-      lastModified: new Date("2026-11-05T00:00:00.000Z"),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/affiliate`,
-      lastModified: new Date("2026-10-09T00:00:00.000Z"),
-      changeFrequency: "monthly",
-      priority: 0.6,
-      videos: [
-        {
-          title: "How the SupoClip creator program works",
-          description: "Apply, pick your code, and your audience gets 20% off their first 3 months.",
-          thumbnail_loc: `${siteUrl}/videos/creator-program-poster.jpg`,
-          content_loc: `${siteUrl}/videos/creator-program.mp4`,
-          duration: 27,
-          publication_date: "2026-10-09",
-        },
-      ],
     },
   ];
 }
