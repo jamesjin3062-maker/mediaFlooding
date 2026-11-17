@@ -172,9 +172,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <SidebarLink compact={compact} href="/refer" label="Refer & Earn" active={pathname.startsWith("/refer")}>
             <Gift className="size-4" />
           </SidebarLink>
-          <SidebarLink compact={compact} href="/settings" label={t("nav.settings")} active={pathname === "/settings"}>
-            <Settings className="size-4" />
-          </SidebarLink>
           <UserRow compact={compact} name={user.name} email={user.email} />
         </div>
       </aside> : null}
