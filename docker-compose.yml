@@ -79,6 +79,8 @@ services:
       - CLIPSTAKE_API_KEY=${CLIPSTAKE_API_KEY:-}
       - CLIPSTAKE_LIST_CAMPAIGNS_URL=${CLIPSTAKE_LIST_CAMPAIGNS_URL:-https://app.clipstake.com/api/v1/creator/campaigns}
       - CLIPSTAKE_GET_CAMPAIGN_URL=${CLIPSTAKE_GET_CAMPAIGN_URL:-https://app.clipstake.com/api/v1/creator/campaigns}
+      - CLIPSTAKE_LIST_ACCOUNTS_URL=${CLIPSTAKE_LIST_ACCOUNTS_URL:-https://app.clipstake.com/api/v1/creator/accounts}
+      - CLIPSTAKE_ACCOUNT_MEDIA_URL=${CLIPSTAKE_ACCOUNT_MEDIA_URL:-https://app.clipstake.com/api/v1/creator/accounts}
       - STRIPE_CHECKOUT_URL=${STRIPE_CHECKOUT_URL}
       - STRIPE_CUSTOMER_PORTAL_URL=${STRIPE_CUSTOMER_PORTAL_URL}
       - REVENUECAT_WEBHOOK_AUTH_HEADER=${REVENUECAT_WEBHOOK_AUTH_HEADER}
