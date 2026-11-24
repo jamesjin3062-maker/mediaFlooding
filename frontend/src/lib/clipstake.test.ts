@@ -35,7 +35,6 @@ it("reads a Clipstake campaign list", () => {
   });
   expect(campaigns).toHaveLength(1);
   expect(campaignMembership(campaigns[0])).toBe("open");
-  expect(campaigns[0].banner).toMatch(/\.svg$/);
   expect(geoRateLabel(campaigns[0].geo_rates[0])).toBe("US, CA: $0.70 per 1,000 views");
   expect(postingRule(campaigns[0])).toBe("Only posts from the first 48 hours after launch");
   expect(campaigns[0].posted_after_launch_only).toBe(true);

@@ -35,8 +35,6 @@ export type Campaign = {
   launched_at: string | null;
   posted_after_launch_only: boolean;
   submission_window_hours: number | null;
-  banner: string;
-  logo: string;
 };
 
 export type CampaignList = {
@@ -48,25 +46,12 @@ export type CampaignList = {
 
 export type CampaignMembership = "open" | "apply" | "pending" | "closed";
 
-const SAMPLE_ART = [
-  ["northwind", "#d6ff3f", "#111111"],
-  ["harbor", "#ff2d2d", "#1a1a1a"],
-  ["pulse", "#1f8a3b", "#0c1a10"],
-  ["vesper", "#ff8a00", "#2a1200"],
-  ["fieldday", "#123c9c", "#f4f4f4"],
-  ["lumen", "#39ff88", "#06210f"],
-  ["copper", "#e10600", "#140000"],
-  ["summit", "#7dff3a", "#071407"],
-  ["relay", "#f5f5f5", "#111111"],
-  ["crown", "#7a3cff", "#12081f"],
-] as const;
-
 function sampleCampaign(
   index: number,
   fields: Pick<Campaign, "name" | "brand_name" | "status" | "invite_only" | "invite_accepted" | "about" | "platforms">,
 ): Campaign {
-  const [slug, ,] = SAMPLE_ART[index];
   const id = `cmp_${(index + 1).toString(16).padStart(32, "0")}`;
+  const slug = fields.brand_name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "campaign";
   return {
     id,
     slug,
@@ -82,8 +67,6 @@ function sampleCampaign(
     launched_at: fields.status === "active" ? "2026-09-01T00:00:00.000Z" : null,
     posted_after_launch_only: false,
     submission_window_hours: null,
-    banner: `/campaigns/${slug}-banner.svg`,
-    logo: `/campaigns/${slug}-logo.svg`,
     ...fields,
   };
 }
@@ -155,10 +138,18 @@ export function postingRule(campaign: Pick<Campaign, "posted_after_launch_only" 
   return null;
 }
 
-function artFor(id: string): { banner: string; logo: string } {
-  const index = SAMPLE_CAMPAIGNS.findIndex((campaign) => campaign.id === id);
-  const slug = SAMPLE_ART[(index >= 0 ? index : id.length) % SAMPLE_ART.length][0];
-  return { banner: `/campaigns/${slug}-banner.svg`, logo: `/campaigns/${slug}-logo.svg` };
+export function platformLabel(platform: string): string {
+  if (platform === "instagram") return "Instagram";
+  if (platform === "x") return "X";
+  return platform;
+}
+
+export function campaignPayLabel(campaign: Pick<Campaign, "geo_rates" | "platforms">): string | null {
+  const geo = campaign.geo_rates.find((rate) => rate.kind === "include" && rate.cpm_cents != null);
+  if (geo?.cpm_cents != null) return `${formatCents(geo.cpm_cents)} / 1k views`;
+  const platform = campaign.platforms.find((item) => item.cpm_cents != null);
+  if (platform?.cpm_cents != null) return `${formatCents(platform.cpm_cents)} / 1k views`;
+  return null;
 }
 
 function asCampaign(value: unknown): Campaign | null {
@@ -175,7 +166,6 @@ function asCampaign(value: unknown): Campaign | null {
         return [{ platform: platform.platform, cpm_cents: typeof platform.cpm_cents === "number" ? platform.cpm_cents : null }];
       })
     : [];
-  const art = artFor(row.id);
   return {
     id: row.id,
     name: row.name,
@@ -198,8 +188,6 @@ function asCampaign(value: unknown): Campaign | null {
     launched_at: typeof row.launched_at === "string" ? row.launched_at : null,
     posted_after_launch_only: row.posted_after_launch_only === true,
     submission_window_hours: typeof row.submission_window_hours === "number" ? row.submission_window_hours : null,
-    banner: typeof row.banner === "string" ? row.banner : art.banner,
-    logo: typeof row.logo === "string" ? row.logo : art.logo,
   };
 }
 

@@ -5,9 +5,23 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app/app-shell";
+import { CampaignMark, MembershipPill } from "@/components/campaigns/campaign-card";
 import { CampaignCopy } from "@/components/campaigns/campaign-copy";
+import { campaignToneIndex } from "@/lib/campaign-mark";
 import { campaignCopyKey } from "@/lib/campaign-copy";
-import { campaignMembership, geoRateLabel, membershipLabel, postingRule, type Campaign } from "@/lib/clipstake";
+import { campaignMembership, geoRateLabel, platformLabel, postingRule, type Campaign } from "@/lib/clipstake";
+import { cn } from "@/lib/utils";
+
+const DETAIL_GLOWS = [
+  "bg-lime-300/20",
+  "bg-orange-300/20",
+  "bg-sky-300/20",
+  "bg-violet-300/20",
+  "bg-rose-300/20",
+  "bg-amber-200/20",
+  "bg-emerald-300/20",
+  "bg-fuchsia-300/20",
+] as const;
 
 function CampaignSections({ about, instructions }: { about: string; instructions: string }) {
   const same = campaignCopyKey(about) !== "" && campaignCopyKey(about) === campaignCopyKey(instructions);
@@ -64,22 +78,24 @@ export default function CampaignDetailPage() {
         {error ? <p className="mt-6 text-sm text-red-400">{error}</p> : null}
         {!campaign && !error ? <p className="mt-6 text-sm text-white/45">Loading campaign…</p> : null}
         {campaign ? (
-          <article className="mt-4 max-w-3xl overflow-hidden rounded-xl border border-white/10 bg-[#141414]">
-            <div className="relative h-40">
-              <img src={campaign.banner} alt="" className="h-full w-full object-cover" />
-              <img src={campaign.logo} alt="" className="absolute bottom-4 left-4 size-14 rounded-xl border border-black/40 bg-black object-cover" />
-            </div>
-            <div className="space-y-4 px-5 py-5">
-              <div>
-                <h1 className="text-2xl font-semibold">{campaign.name}</h1>
-                <p className="text-sm text-white/45">by {campaign.brand_name}</p>
-                {membership ? <p className="mt-2 text-sm text-emerald-400">{membershipLabel(membership)}</p> : null}
+          <article className="mt-4 max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#161616]">
+            <div className="relative overflow-hidden px-5 py-6">
+              <div className={cn("pointer-events-none absolute -right-10 -top-16 size-48 rounded-full blur-3xl", DETAIL_GLOWS[campaignToneIndex(campaign.brand_name)])} />
+              <div className="relative flex items-start gap-4">
+                <CampaignMark name={campaign.brand_name} className="size-14 rounded-2xl text-base" />
+                <div className="min-w-0">
+                  <h1 className="text-2xl font-semibold leading-tight">{campaign.name}</h1>
+                  <p className="mt-1 text-sm text-white/45">{campaign.brand_name}</p>
+                  {membership ? <div className="mt-3"><MembershipPill membership={membership} /></div> : null}
+                </div>
               </div>
+            </div>
+            <div className="space-y-4 px-5 pb-5">
               <CampaignSections about={campaign.about} instructions={campaign.instructions} />
               <dl className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
                   <dt className="text-white/40">Platforms</dt>
-                  <dd>{campaign.platforms.map((item) => item.platform).join(", ") || "—"}</dd>
+                  <dd>{campaign.platforms.map((item) => platformLabel(item.platform)).join(", ") || "—"}</dd>
                 </div>
                 <div>
                   <dt className="text-white/40">Clips submitted</dt>

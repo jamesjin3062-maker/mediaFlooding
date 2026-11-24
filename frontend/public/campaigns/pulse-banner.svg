@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200">
-  <rect width="640" height="200" fill="#04140c"/>
-  <rect x="0" y="0" width="220" height="200" fill="#19c37d"/>
-  <circle cx="470" cy="40" r="90" fill="#19c37d" opacity="0.35"/>
-  <text x="250" y="122" fill="#19c37d" font-size="64" font-family="Arial Black, Arial, sans-serif">PULSE</text>
-</svg>

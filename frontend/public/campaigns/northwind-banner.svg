@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200">
-  <rect width="640" height="200" fill="#111111"/>
-  <rect x="0" y="0" width="220" height="200" fill="#d6ff3f"/>
-  <circle cx="470" cy="40" r="90" fill="#d6ff3f" opacity="0.35"/>
-  <text x="250" y="122" fill="#d6ff3f" font-size="64" font-family="Arial Black, Arial, sans-serif">NORTHWIND</text>
-</svg>
