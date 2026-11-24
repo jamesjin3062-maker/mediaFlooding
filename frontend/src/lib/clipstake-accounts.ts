@@ -1,4 +1,4 @@
-import { CLIPSTAKE_API_BASE_URL } from "@/lib/clipstake";
+import { CLIPSTAKE_API_BASE_URL, clipstakeRequestInit, readClipstakeCache } from "@/lib/clipstake";
 
 export type PostingAccount = {
   id: string;
@@ -219,13 +219,24 @@ export async function listAccounts(options: { platform?: string | null; cursor?:
   const headers = authHeaders();
   if (!headers) return { source: "sample", notice: null, data: sample, next_cursor: null };
 
+  const cursor = options.cursor?.trim() || "";
+  const key = `accounts:${platform ?? "all"}:${cursor}`;
+  return readClipstakeCache(key, () => loadAccounts(headers, platform, cursor, sample), (list) => list.source === "clipstake");
+}
+
+async function loadAccounts(
+  headers: HeadersInit,
+  platform: "instagram" | "x" | null,
+  cursor: string,
+  sample: PostingAccount[],
+): Promise<AccountList> {
   const url = new URL(accountsUrl());
   url.searchParams.set("limit", "100");
   if (platform) url.searchParams.set("platform", platform);
-  if (options.cursor) url.searchParams.set("cursor", options.cursor);
+  if (cursor) url.searchParams.set("cursor", cursor);
 
   try {
-    const response = await fetch(url, { headers, cache: "no-store" });
+    const response = await fetch(url, clipstakeRequestInit(headers));
     if (!response.ok) {
       return { source: "sample", notice: "Clipstake did not return accounts, so this list is a sample.", data: sample, next_cursor: null };
     }
@@ -246,7 +257,7 @@ export async function listAccountMedia(id: string, cursor?: string | null): Prom
   if (cursor) url.searchParams.set("cursor", cursor);
 
   try {
-    const response = await fetch(url, { headers, cache: "no-store" });
+    const response = await fetch(url, clipstakeRequestInit(headers));
     if (response.ok) {
       const payload = await response.json();
       return { source: "clipstake", data: parseMediaList(payload), next_cursor: cursorOf(payload), error: null };

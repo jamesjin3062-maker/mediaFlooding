@@ -177,13 +177,46 @@ function authHeaders(): HeadersInit | null {
   return { Authorization: `Bearer ${key}`, Accept: "application/json" };
 }
 
+const CLIPSTAKE_CACHE_MS = 60_000;
+const CLIPSTAKE_TIMEOUT_MS = 8_000;
+
+type CacheEntry = { expires: number; value: unknown };
+const clipstakeCache = new Map<string, CacheEntry>();
+const clipstakeInflight = new Map<string, Promise<unknown>>();
+
+/** Reuse a successful Clipstake response for a minute, and share one in-flight request. */
+export function readClipstakeCache<T>(key: string, load: () => Promise<T>, keep: (value: T) => boolean): Promise<T> {
+  const hit = clipstakeCache.get(key);
+  if (hit && hit.expires > Date.now()) return Promise.resolve(hit.value as T);
+  const running = clipstakeInflight.get(key) as Promise<T> | undefined;
+  if (running) return running;
+  const promise = load()
+    .then((value) => {
+      if (keep(value)) clipstakeCache.set(key, { expires: Date.now() + CLIPSTAKE_CACHE_MS, value });
+      return value;
+    })
+    .finally(() => {
+      if (clipstakeInflight.get(key) === promise) clipstakeInflight.delete(key);
+    });
+  clipstakeInflight.set(key, promise);
+  return promise;
+}
+
+export function clipstakeRequestInit(headers: HeadersInit): RequestInit {
+  return { headers, cache: "no-store", signal: AbortSignal.timeout(CLIPSTAKE_TIMEOUT_MS) };
+}
+
 export async function listCampaigns(): Promise<CampaignList> {
   const headers = authHeaders();
   if (!headers) {
     return { source: "sample", notice: null, data: SAMPLE_CAMPAIGNS, next_cursor: null };
   }
+  return readClipstakeCache("campaigns", () => loadCampaigns(headers), (list) => list.source === "clipstake");
+}
+
+async function loadCampaigns(headers: HeadersInit): Promise<CampaignList> {
   try {
-    const response = await fetch(`${listUrl()}?limit=100`, { headers, cache: "no-store" });
+    const response = await fetch(`${listUrl()}?limit=100`, clipstakeRequestInit(headers));
     if (!response.ok) {
       return { source: "sample", notice: "Clipstake did not return campaigns, so this list is a sample.", data: SAMPLE_CAMPAIGNS, next_cursor: null };
     }
@@ -204,8 +237,16 @@ export async function getCampaign(id: string): Promise<{ source: "clipstake" | "
   const sample = SAMPLE_CAMPAIGNS.find((campaign) => campaign.id === id) ?? null;
   const headers = authHeaders();
   if (!headers) return { source: "sample", campaign: sample };
+  return readClipstakeCache(`campaign:${id}`, () => loadCampaign(id, headers, sample), (result) => result.source === "clipstake");
+}
+
+async function loadCampaign(
+  id: string,
+  headers: HeadersInit,
+  sample: Campaign | null,
+): Promise<{ source: "clipstake" | "sample"; campaign: Campaign | null }> {
   try {
-    const response = await fetch(campaignUrl(id), { headers, cache: "no-store" });
+    const response = await fetch(campaignUrl(id), clipstakeRequestInit(headers));
     if (response.status === 404) return { source: "clipstake", campaign: null };
     if (!response.ok) return { source: "sample", campaign: sample };
     return { source: "clipstake", campaign: parseCampaign(await response.json()) };
