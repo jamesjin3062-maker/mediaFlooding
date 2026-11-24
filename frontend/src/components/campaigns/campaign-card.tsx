@@ -1,45 +1,24 @@
 import Link from "next/link";
 
 import { campaignInitials, campaignToneIndex } from "@/lib/campaign-mark";
+import { calm, calmMarks } from "@/lib/calm-color";
 import { campaignMembership, campaignPayLabel, membershipLabel, platformLabel, type Campaign, type CampaignMembership } from "@/lib/clipstake";
 import { cn } from "@/lib/utils";
 
-const TONES = [
-  "bg-lime-300",
-  "bg-orange-300",
-  "bg-sky-300",
-  "bg-violet-300",
-  "bg-rose-300",
-  "bg-amber-200",
-  "bg-emerald-300",
-  "bg-fuchsia-300",
-] as const;
-
 export function CampaignMark({ name, className }: { name: string; className?: string }) {
-  const tone = TONES[campaignToneIndex(name)] ?? TONES[0];
+  const tone = calmMarks[campaignToneIndex(name) % calmMarks.length] ?? calm.slate.surface;
   return (
-    <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold tracking-wide text-black", tone, className)}>
+    <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold tracking-wide", tone, className)}>
       {campaignInitials(name)}
     </div>
   );
 }
 
 export function MembershipPill({ membership }: { membership: CampaignMembership }) {
+  const tone = membership === "pending" ? calm.sand : membership === "closed" ? null : calm.sage;
   return (
-    <span className={cn(
-      "inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[11px] font-medium",
-      membership === "open" && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-      membership === "apply" && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-      membership === "pending" && "bg-amber-500/10 text-amber-800 dark:text-amber-300",
-      membership === "closed" && "bg-muted text-muted-foreground",
-    )}>
-      <span className={cn(
-        "size-1.5 rounded-full",
-        membership === "open" && "bg-emerald-600 dark:bg-emerald-300",
-        membership === "apply" && "bg-emerald-600 dark:bg-emerald-300",
-        membership === "pending" && "bg-amber-600 dark:bg-amber-300",
-        membership === "closed" && "bg-muted-foreground/50",
-      )} />
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[11px] font-medium", tone?.surface ?? "bg-muted text-muted-foreground")}>
+      <span className={cn("size-1.5 rounded-full", tone?.dot ?? "bg-muted-foreground/50")} />
       {membershipLabel(membership)}
     </span>
   );
