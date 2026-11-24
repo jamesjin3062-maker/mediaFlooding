@@ -1,4 +1,4 @@
-import { campaignMembership, membershipLabel, parseCampaignList, SAMPLE_CAMPAIGNS } from "./clipstake";
+import { campaignMembership, geoRateLabel, membershipLabel, parseCampaignList, postingRule, SAMPLE_CAMPAIGNS } from "./clipstake";
 
 it("labels sample campaigns the way the board shows them", () => {
   expect(membershipLabel(campaignMembership(SAMPLE_CAMPAIGNS[0]))).toBe("No active campaigns");
@@ -27,10 +27,16 @@ it("reads a Clipstake campaign list", () => {
       start_date: "2026-09-15T00:00:00.000Z",
       end_date: null,
       launched_at: "2026-09-15T09:00:00.000Z",
+      geo_rates: [{ kind: "include", cpm_cents: 70, countries: ["US", "CA"] }],
+      posted_after_launch_only: true,
+      submission_window_hours: 48,
     }],
     next_cursor: null,
   });
   expect(campaigns).toHaveLength(1);
   expect(campaignMembership(campaigns[0])).toBe("open");
   expect(campaigns[0].banner).toMatch(/\.svg$/);
+  expect(geoRateLabel(campaigns[0].geo_rates[0])).toBe("US, CA: $0.70 per 1,000 views");
+  expect(postingRule(campaigns[0])).toBe("Only posts from the first 48 hours after launch");
+  expect(campaigns[0].posted_after_launch_only).toBe(true);
 });

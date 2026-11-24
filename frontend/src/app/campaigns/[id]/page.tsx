@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app/app-shell";
 import { CampaignCopy } from "@/components/campaigns/campaign-copy";
 import { campaignCopyKey } from "@/lib/campaign-copy";
-import { campaignMembership, membershipLabel, type Campaign } from "@/lib/clipstake";
+import { campaignMembership, geoRateLabel, membershipLabel, postingRule, type Campaign } from "@/lib/clipstake";
 
 function CampaignSections({ about, instructions }: { about: string; instructions: string }) {
   const same = campaignCopyKey(about) !== "" && campaignCopyKey(about) === campaignCopyKey(instructions);
@@ -55,6 +55,7 @@ export default function CampaignDetailPage() {
   }, [params.id]);
 
   const membership = campaign ? campaignMembership(campaign) : null;
+  const posting = campaign ? postingRule(campaign) : null;
 
   return (
     <AppShell>
@@ -84,6 +85,22 @@ export default function CampaignDetailPage() {
                   <dt className="text-white/40">Clips submitted</dt>
                   <dd>{campaign.clip_count} / {campaign.max_clips}</dd>
                 </div>
+                {campaign.geo_rates.length > 0 ? (
+                  <div className="sm:col-span-2">
+                    <dt className="text-white/40">Country rates</dt>
+                    <dd className="mt-1 space-y-1">
+                      {campaign.geo_rates.map((rate) => (
+                        <p key={`${rate.kind}:${rate.countries.join(",")}`}>{geoRateLabel(rate)}</p>
+                      ))}
+                    </dd>
+                  </div>
+                ) : null}
+                {posting ? (
+                  <div className="sm:col-span-2">
+                    <dt className="text-white/40">Posts accepted</dt>
+                    <dd className="mt-1">{posting}</dd>
+                  </div>
+                ) : null}
               </dl>
             </div>
           </article>

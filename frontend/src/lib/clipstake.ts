@@ -7,6 +7,12 @@ export type CampaignPlatform = {
   cpm_cents: number | null;
 };
 
+export type GeoRate = {
+  kind: "include" | "exclude";
+  cpm_cents: number | null;
+  countries: string[];
+};
+
 export type Campaign = {
   id: string;
   name: string;
@@ -19,6 +25,7 @@ export type Campaign = {
   invite_accepted: boolean;
   platforms: CampaignPlatform[];
   geo_enabled: boolean;
+  geo_rates: GeoRate[];
   max_payout_per_clip_cents: number;
   platform_fee_bps: number;
   max_clips: number;
@@ -26,6 +33,8 @@ export type Campaign = {
   start_date: string;
   end_date: string | null;
   launched_at: string | null;
+  posted_after_launch_only: boolean;
+  submission_window_hours: number | null;
   banner: string;
   logo: string;
 };
@@ -63,6 +72,7 @@ function sampleCampaign(
     slug,
     instructions: "Post the clip on an accepted platform, then submit the post link.",
     geo_enabled: false,
+    geo_rates: [],
     max_payout_per_clip_cents: 25000,
     platform_fee_bps: 1500,
     max_clips: 20,
@@ -70,6 +80,8 @@ function sampleCampaign(
     start_date: "2026-09-01T00:00:00.000Z",
     end_date: null,
     launched_at: fields.status === "active" ? "2026-09-01T00:00:00.000Z" : null,
+    posted_after_launch_only: false,
+    submission_window_hours: null,
     banner: `/campaigns/${slug}-banner.svg`,
     logo: `/campaigns/${slug}-logo.svg`,
     ...fields,
@@ -102,6 +114,45 @@ export function membershipLabel(membership: CampaignMembership): string {
   if (membership === "apply") return "Apply to join";
   if (membership === "pending") return "Application pending";
   return "No active campaigns";
+}
+
+function asGeoRates(value: unknown): GeoRate[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as Record<string, unknown>;
+    if (row.kind !== "include" && row.kind !== "exclude") return [];
+    const countries = Array.isArray(row.countries)
+      ? row.countries.flatMap((code) => (typeof code === "string" && code.trim() ? [code.trim()] : []))
+      : [];
+    return [{
+      kind: row.kind,
+      cpm_cents: typeof row.cpm_cents === "number" ? row.cpm_cents : null,
+      countries,
+    }];
+  });
+}
+
+export function formatCents(cents: number): string {
+  const sign = cents < 0 ? "-" : "";
+  const absolute = Math.abs(Math.trunc(cents));
+  return `${sign}$${Math.floor(absolute / 100)}.${(absolute % 100).toString().padStart(2, "0")}`;
+}
+
+export function geoRateLabel(rate: GeoRate): string {
+  const countries = rate.countries.join(", ") || "Other countries";
+  if (rate.kind === "exclude") return `No pay for views from ${countries}`;
+  const pay = rate.cpm_cents == null ? "Country rate" : `${formatCents(rate.cpm_cents)} per 1,000 views`;
+  return `${countries}: ${pay}`;
+}
+
+export function postingRule(campaign: Pick<Campaign, "posted_after_launch_only" | "submission_window_hours">): string | null {
+  if (typeof campaign.submission_window_hours === "number") {
+    const hours = campaign.submission_window_hours;
+    return `Only posts from the first ${hours} ${hours === 1 ? "hour" : "hours"} after launch`;
+  }
+  if (campaign.posted_after_launch_only) return "Only posts published after the campaign launched";
+  return null;
 }
 
 function artFor(id: string): { banner: string; logo: string } {
@@ -137,6 +188,7 @@ function asCampaign(value: unknown): Campaign | null {
     invite_accepted: row.invite_accepted === true,
     platforms,
     geo_enabled: row.geo_enabled === true,
+    geo_rates: asGeoRates(row.geo_rates),
     max_payout_per_clip_cents: typeof row.max_payout_per_clip_cents === "number" ? row.max_payout_per_clip_cents : 0,
     platform_fee_bps: typeof row.platform_fee_bps === "number" ? row.platform_fee_bps : 0,
     max_clips: typeof row.max_clips === "number" ? row.max_clips : 0,
@@ -144,6 +196,8 @@ function asCampaign(value: unknown): Campaign | null {
     start_date: typeof row.start_date === "string" ? row.start_date : "",
     end_date: typeof row.end_date === "string" ? row.end_date : null,
     launched_at: typeof row.launched_at === "string" ? row.launched_at : null,
+    posted_after_launch_only: row.posted_after_launch_only === true,
+    submission_window_hours: typeof row.submission_window_hours === "number" ? row.submission_window_hours : null,
     banner: typeof row.banner === "string" ? row.banner : art.banner,
     logo: typeof row.logo === "string" ? row.logo : art.logo,
   };
