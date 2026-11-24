@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronRight, Search } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { campaignInitials } from "@/lib/campaign-mark";
 import { calm, platformTone } from "@/lib/calm-color";
@@ -15,10 +16,15 @@ import { cn } from "@/lib/utils";
 const th = "border-b bg-muted/30 px-4 py-3 text-left text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground first:pl-5 last:pr-5";
 const td = "border-b px-4 py-4 align-middle group-last:border-b-0 first:pl-5 last:pr-5";
 
-const FILTERS = [
+const TYPE_FILTERS = [
   { id: "", label: "All" },
   { id: "instagram", label: "Instagram" },
   { id: "x", label: "X" },
+] as const;
+
+const ORDER_FILTERS = [
+  { id: "az", label: "A–Z" },
+  { id: "za", label: "Z–A" },
 ] as const;
 
 function formatFollowers(count: number | null): string | null {
@@ -28,6 +34,8 @@ function formatFollowers(count: number | null): string | null {
 
 export function AccountsBoard() {
   const [platform, setPlatform] = useState("");
+  const [order, setOrder] = useState<"az" | "za">("az");
+  const [query, setQuery] = useState("");
   const [list, setList] = useState<AccountList | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,8 +69,21 @@ export function AccountsBoard() {
     setList({ ...page, data: [...list.data, ...page.data] });
   }
 
-  const accounts = list?.data ?? [];
-  const readyCount = accounts.filter((account) => canSubmitAccount(account)).length;
+  const sorted = useMemo(() => {
+    const rows = [...(list?.data ?? [])];
+    rows.sort((a, b) => a.handle.localeCompare(b.handle, undefined, { sensitivity: "base" }));
+    if (order === "za") rows.reverse();
+    return rows;
+  }, [list, order]);
+  const accounts = useMemo(() => {
+    const needle = query.trim().replace(/^@/, "").toLowerCase();
+    if (!needle) return sorted;
+    return sorted.filter((account) => {
+      const haystack = `${account.handle} ${platformLabel(account.platform)} ${account.status.replaceAll("_", " ")}`.toLowerCase();
+      return haystack.includes(needle);
+    });
+  }, [sorted, query]);
+  const readyCount = sorted.filter((account) => canSubmitAccount(account)).length;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8 md:py-12">
@@ -75,9 +96,9 @@ export function AccountsBoard() {
           </p>
         </div>
         <dl className="grid grid-cols-3 gap-2 sm:gap-3">
-          <Stat label="Profiles" value={list ? String(accounts.length) : "—"} />
+          <Stat label="Profiles" value={list ? String(sorted.length) : "—"} />
           <Stat label="Ready" value={list ? String(readyCount) : "—"} />
-          <Stat label="Needs care" value={list ? String(accounts.length - readyCount) : "—"} />
+          <Stat label="Needs care" value={list ? String(sorted.length - readyCount) : "—"} />
         </dl>
       </header>
 
@@ -85,32 +106,49 @@ export function AccountsBoard() {
       {list?.notice ? <p className="mt-4 text-xs text-muted-foreground">{list.notice}</p> : null}
 
       <section className="mt-8 overflow-hidden rounded-2xl border bg-card shadow-sm">
-        <div className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <p className="text-sm font-medium">{list ? `${accounts.length} shown` : "Loading profiles"}</p>
-          <div className="flex gap-1.5" role="tablist" aria-label="Platform">
-            {FILTERS.map((filter) => (
-              <button
-                key={filter.id || "all"}
-                type="button"
-                role="tab"
-                aria-selected={platform === filter.id}
-                onClick={() => setPlatform(filter.id)}
-                className={cn(
-                  "inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-colors",
-                  platform === filter.id ? "border-foreground bg-foreground text-background" : "bg-background text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {filter.label}
-              </button>
-            ))}
+        <div className="flex flex-col gap-3 border-b px-4 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:w-56">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search handles"
+                aria-label="Search accounts"
+                className="h-8 rounded-full bg-background pl-9"
+              />
+            </div>
+            <p className="text-sm font-medium">{list ? `${accounts.length} shown` : "Loading profiles"}</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <FilterGroup label="Type">
+              {TYPE_FILTERS.map((filter) => (
+                <FilterButton key={filter.id || "all"} pressed={platform === filter.id} onClick={() => setPlatform(filter.id)}>
+                  {filter.label}
+                </FilterButton>
+              ))}
+            </FilterGroup>
+            <FilterGroup label="Order">
+              {ORDER_FILTERS.map((filter) => (
+                <FilterButton key={filter.id} pressed={order === filter.id} onClick={() => setOrder(filter.id)}>
+                  {filter.label}
+                </FilterButton>
+              ))}
+            </FilterGroup>
           </div>
         </div>
 
         {!list && !error ? <AccountTableSkeleton /> : null}
-        {list && accounts.length === 0 ? (
+        {list && sorted.length === 0 ? (
           <div className="flex h-36 flex-col items-center justify-center gap-1 px-6 text-center">
             <p className="font-display text-lg font-semibold">No profiles yet</p>
             <p className="max-w-sm text-sm text-muted-foreground">Connect an Instagram or X profile in Clipstake, then it will show up here.</p>
+          </div>
+        ) : null}
+        {list && sorted.length > 0 && accounts.length === 0 ? (
+          <div className="flex h-36 flex-col items-center justify-center gap-1 px-6 text-center">
+            <p className="font-display text-lg font-semibold">No matching profiles</p>
+            <p className="max-w-sm text-sm text-muted-foreground">Try another handle, or clear the search.</p>
           </div>
         ) : null}
 
@@ -120,6 +158,7 @@ export function AccountsBoard() {
               <caption className="sr-only">Connected accounts</caption>
               <thead>
                 <tr>
+                  <th className={cn(th, "w-14")}>#</th>
                   <th className={th}>Account</th>
                   <th className={th}>Platform</th>
                   <th className={th}>Status</th>
@@ -129,7 +168,7 @@ export function AccountsBoard() {
                 </tr>
               </thead>
               <tbody>
-                {accounts.map((account) => <AccountRow key={account.id} account={account} />)}
+                {accounts.map((account, index) => <AccountRow key={account.id} account={account} index={index + 1} />)}
               </tbody>
             </table>
           </div>
@@ -144,6 +183,31 @@ export function AccountsBoard() {
         ) : null}
       </section>
     </main>
+  );
+}
+
+function FilterGroup({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={label}>
+      <span className="mr-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function FilterButton({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={pressed}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-colors",
+        pressed ? "border-foreground bg-foreground text-background" : "bg-background text-muted-foreground hover:text-foreground",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -191,13 +255,14 @@ function AccountMark({ account }: { account: PostingAccount }) {
   );
 }
 
-function AccountRow({ account }: { account: PostingAccount }) {
+function AccountRow({ account, index }: { account: PostingAccount; index: number }) {
   const note = accountStatusNote(account);
   const followers = formatFollowers(account.followers_count);
   const ready = canSubmitAccount(account);
   const countries = viewerCountries(account);
   return (
     <tr className="group transition-colors hover:bg-[oklch(0.97_0.012_235)] dark:hover:bg-[oklch(0.24_0.015_235)]">
+      <td className={cn(td, "w-14 tabular-nums text-muted-foreground")}>{index}</td>
       <td className={td}>
         <Link href={`/accounts/${account.id}`} className="flex w-full items-center gap-3">
           <AccountMark account={account} />
