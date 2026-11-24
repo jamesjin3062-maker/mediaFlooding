@@ -5,7 +5,11 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app/app-shell";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { accountStatusNote, canSubmitAccount, type AccountList, type InstagramPost, type MediaList, type PostingAccount } from "@/lib/clipstake-accounts";
+import { platformLabel } from "@/lib/clipstake";
 
 export default function AccountDetailPage() {
   const params = useParams<{ id: string }>();
@@ -56,56 +60,51 @@ export default function AccountDetailPage() {
 
   return (
     <AppShell>
-      <main className="min-h-full bg-[#0c0c0c] px-4 py-6 text-white sm:px-8">
-        <Link href="/accounts" className="text-sm text-white/50 hover:text-white">Accounts</Link>
-        {missing ? <p className="mt-6 text-sm text-white/50">No such account.</p> : null}
-        {!account && !missing ? <p className="mt-6 text-sm text-white/45">Loading account…</p> : null}
+      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8 md:py-10">
+        <Link href="/accounts" className="text-sm text-muted-foreground hover:text-foreground">Accounts</Link>
+        {missing ? <p className="mt-6 text-sm text-muted-foreground">No such account.</p> : null}
+        {!account && !missing ? <p className="mt-6 text-sm text-muted-foreground">Loading account…</p> : null}
         {account ? (
-          <article className="mt-4 max-w-2xl">
-            <h1 className="text-2xl font-semibold">@{account.handle}</h1>
-            <p className="mt-1 text-sm uppercase tracking-wide text-white/40">{account.platform} · {account.status.replaceAll("_", " ")}</p>
-            {note ? <p className="mt-3 text-sm leading-6 text-white/60">{note}</p> : null}
-            {!canSubmitAccount(account) ? <p className="mt-2 text-sm text-amber-300">Submit is off for this account.</p> : null}
+          <article className="mt-4">
+            <h1 className="font-display text-3xl font-bold tracking-tight">@{account.handle}</h1>
+            <p className="mt-1 text-sm uppercase tracking-wide text-muted-foreground">{platformLabel(account.platform)} · {account.status.replaceAll("_", " ")}</p>
+            {note ? <p className="mt-3 text-sm leading-6 text-muted-foreground">{note}</p> : null}
+            {!canSubmitAccount(account) ? <p className="mt-2 text-sm text-amber-700 dark:text-amber-300">Submit is off for this account.</p> : null}
 
             {account.platform === "instagram" ? (
               <section className="mt-6">
-                <button
-                  type="button"
-                  onClick={() => void loadPosts(null)}
-                  disabled={loadingPosts}
-                  className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-black disabled:opacity-50"
-                >
+                <Button type="button" onClick={() => void loadPosts(null)} disabled={loadingPosts}>
                   {posts ? "Refresh posts" : "Load posts"}
-                </button>
-                {mediaError ? <p className="mt-3 text-sm text-red-400">{mediaError}</p> : null}
+                </Button>
+                {mediaError ? <p className="mt-3 text-sm text-destructive">{mediaError}</p> : null}
                 <ul className="mt-4 space-y-3">
                   {(posts ?? []).map((post) => (
-                    <li key={post.media_id} className="rounded-xl border border-white/10 bg-[#141414] p-3">
+                    <li key={post.media_id} className="rounded-xl border bg-card p-3 text-card-foreground shadow-sm">
                       <p className="text-sm">{post.caption || "No caption"}</p>
-                      <p className="mt-1 text-xs text-white/40">{post.like_count} likes · {post.comments_count} comments</p>
-                      {post.submitted ? <p className="mt-2 text-xs text-white/50">Already submitted. It cannot be submitted again.</p> : null}
-                      {post.permalink ? <a href={post.permalink} className="mt-2 block text-xs text-white/60 underline-offset-4 hover:underline">{post.permalink}</a> : null}
+                      <p className="mt-1 text-xs text-muted-foreground">{post.like_count} likes · {post.comments_count} comments</p>
+                      {post.submitted ? <p className="mt-2 text-xs text-muted-foreground">Already submitted. It cannot be submitted again.</p> : null}
+                      {post.permalink ? <a href={post.permalink} className="mt-2 block truncate text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">{post.permalink}</a> : null}
                     </li>
                   ))}
                 </ul>
                 {cursor ? (
-                  <button type="button" onClick={() => void loadPosts(cursor)} className="mt-3 text-sm text-white/70 underline-offset-4 hover:underline">
+                  <Button type="button" variant="outline" onClick={() => void loadPosts(cursor)} className="mt-3">
                     Load more posts
-                  </button>
+                  </Button>
                 ) : null}
               </section>
             ) : null}
 
             {account.platform === "x" ? (
-              <label className="mt-6 block">
-                <span className="text-sm text-white/60">Post URL</span>
-                <input
+              <div className="mt-6 space-y-2">
+                <Label htmlFor="post-url">Post URL</Label>
+                <Input
+                  id="post-url"
                   value={postUrl}
                   onChange={(event) => setPostUrl(event.target.value)}
                   placeholder="https://x.com/northwind/status/1845123456789012345"
-                  className="mt-2 h-10 w-full rounded-lg border border-white/10 bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                 />
-              </label>
+              </div>
             ) : null}
           </article>
         ) : null}

@@ -10,7 +10,7 @@ export function CampaignCopy({ value, className }: { value: string; className?: 
         <p key={index}>
           {block.nodes.map((node, nodeIndex) => (
             node.bold
-              ? <strong key={nodeIndex} className="font-semibold text-white">{node.text}</strong>
+              ? <strong key={nodeIndex} className="font-semibold text-foreground">{node.text}</strong>
               : <span key={nodeIndex}>{node.text}</span>
           ))}
         </p>

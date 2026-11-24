@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { accountStatusNote, canSubmitAccount, type AccountList, type PostingAccount } from "@/lib/clipstake-accounts";
+import { platformLabel } from "@/lib/clipstake";
 import { cn } from "@/lib/utils";
 
 const FILTERS = [
@@ -55,19 +57,24 @@ export function AccountsBoard() {
   const accounts = list?.data ?? [];
 
   return (
-    <main className="min-h-full bg-[#0c0c0c] px-4 py-6 text-white sm:px-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="flex items-center gap-2 text-base font-semibold">
-          Accounts
-          <span className="text-sm font-medium text-white/45">{accounts.length}</span>
-        </h1>
-        <div className="flex gap-1 rounded-lg border border-white/10 p-1">
+    <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8 md:py-10">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Accounts</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{accounts.length} connected</p>
+        </div>
+        <div className="flex gap-1.5" role="tablist" aria-label="Platform">
           {FILTERS.map((filter) => (
             <button
               key={filter.id || "all"}
               type="button"
+              role="tab"
+              aria-selected={platform === filter.id}
               onClick={() => setPlatform(filter.id)}
-              className={cn("rounded-md px-3 py-1 text-sm", platform === filter.id ? "bg-white text-black" : "text-white/60 hover:text-white")}
+              className={cn(
+                "inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-colors",
+                platform === filter.id ? "border-foreground bg-foreground text-background" : "bg-background text-muted-foreground hover:text-foreground",
+              )}
             >
               {filter.label}
             </button>
@@ -75,10 +82,10 @@ export function AccountsBoard() {
         </div>
       </div>
 
-      {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
-      {!list && !error ? <p className="mt-4 text-sm text-white/45">Loading accounts…</p> : null}
+      {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
+      {!list && !error ? <p className="mt-4 text-sm text-muted-foreground">Loading accounts…</p> : null}
       {list && accounts.length === 0 ? (
-        <div className="mt-4 flex h-28 items-center justify-center rounded-xl border border-white/10 text-sm text-white/45">
+        <div className="mt-4 flex h-28 items-center justify-center rounded-xl border bg-card text-sm text-muted-foreground">
           No profiles are connected to this Clipstake user yet.
         </div>
       ) : null}
@@ -87,11 +94,11 @@ export function AccountsBoard() {
         {accounts.map((account) => <AccountRow key={account.id} account={account} />)}
       </ul>
       {list?.next_cursor ? (
-        <button type="button" onClick={() => void loadMore()} className="mt-4 text-sm text-white/70 underline-offset-4 hover:underline">
+        <Button type="button" variant="outline" onClick={() => void loadMore()} className="mt-4">
           Load more
-        </button>
+        </Button>
       ) : null}
-      {list?.notice ? <p className="mt-4 text-xs text-white/35">{list.notice}</p> : null}
+      {list?.notice ? <p className="mt-4 text-xs text-muted-foreground">{list.notice}</p> : null}
     </main>
   );
 }
@@ -102,22 +109,25 @@ function AccountRow({ account }: { account: PostingAccount }) {
   const ready = canSubmitAccount(account);
   return (
     <li>
-      <Link href={`/accounts/${account.id}`} className="block rounded-xl border border-white/10 bg-[#141414] px-4 py-3 hover:border-white/25">
+      <Link href={`/accounts/${account.id}`} className="block rounded-xl border bg-card px-4 py-3 text-card-foreground shadow-sm transition-colors hover:border-foreground/20">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold">@{account.handle}</p>
-            <p className="mt-0.5 text-xs uppercase tracking-wide text-white/40">{account.platform}</p>
+            <p className="mt-0.5 text-xs uppercase tracking-wide text-muted-foreground">{platformLabel(account.platform)}</p>
           </div>
-          <span className={cn("rounded-full px-2 py-0.5 text-xs", ready ? "bg-emerald-500/15 text-emerald-300" : "bg-amber-500/15 text-amber-300")}>
+          <span className={cn(
+            "rounded-full px-2 py-0.5 text-xs",
+            ready ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-amber-500/10 text-amber-800 dark:text-amber-300",
+          )}>
             {account.status.replaceAll("_", " ")}
           </span>
         </div>
-        <p className="mt-2 text-xs text-white/50">
+        <p className="mt-2 text-xs text-muted-foreground">
           {followers ? `${followers} followers` : "Followers not available"}
           {account.viewer_locations_available === true ? " · viewer countries on file" : ""}
           {account.viewer_locations_available === false ? " · no viewer countries" : ""}
         </p>
-        {note ? <p className="mt-2 text-xs leading-5 text-white/55">{note}</p> : null}
+        {note ? <p className="mt-2 text-xs leading-5 text-muted-foreground">{note}</p> : null}
       </Link>
     </li>
   );

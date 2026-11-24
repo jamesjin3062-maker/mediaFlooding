@@ -33,35 +33,35 @@ export function CampaignsBoard() {
   const active = campaigns.filter((campaign) => campaignMembership(campaign) === "open");
 
   return (
-    <main className="min-h-full bg-[#0c0c0c] px-4 py-6 text-white sm:px-8">
+    <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-8 md:py-10">
       <section>
-        <h1 className="flex items-center gap-2 text-base font-semibold">
+        <h1 className="flex items-center gap-2 font-display text-3xl font-bold tracking-tight">
           Active campaigns
-          <span className="rounded-full bg-white/10 px-1.5 text-xs font-medium text-white/70">{active.length}</span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">{active.length}</span>
         </h1>
         {active.length === 0 ? (
-          <div className="mt-3 flex h-28 flex-col items-center justify-center gap-2 rounded-xl border border-white/10 text-sm text-white/45">
+          <div className="mt-4 flex h-28 flex-col items-center justify-center gap-2 rounded-xl border bg-card text-sm text-muted-foreground">
             <Megaphone className="size-4" />
             No campaigns open to you right now.
           </div>
         ) : (
-          <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {active.map((campaign) => <CampaignCard key={campaign.id} campaign={campaign} />)}
           </div>
         )}
       </section>
 
-      <section className="mt-8">
-        <h2 className="flex items-center gap-2 text-base font-semibold">
+      <section className="mt-10">
+        <h2 className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight">
           Organizations
-          <span className="text-sm font-medium text-white/45">{campaigns.length}</span>
+          <span className="text-sm font-medium text-muted-foreground">{campaigns.length}</span>
         </h2>
-        {error ? <p className="mt-3 text-sm text-red-400">{error}</p> : null}
-        {!list && !error ? <p className="mt-3 text-sm text-white/45">Loading campaigns…</p> : null}
-        <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
+        {!list && !error ? <p className="mt-3 text-sm text-muted-foreground">Loading campaigns…</p> : null}
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {campaigns.map((campaign: Campaign) => <CampaignCard key={campaign.id} campaign={campaign} />)}
         </div>
-        {list?.notice ? <p className="mt-4 text-xs text-white/35">{list.notice}</p> : null}
+        {list?.notice ? <p className="mt-4 text-xs text-muted-foreground">{list.notice}</p> : null}
       </section>
     </main>
   );
