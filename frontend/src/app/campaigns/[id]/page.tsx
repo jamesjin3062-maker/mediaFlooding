@@ -5,7 +5,30 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app/app-shell";
+import { CampaignCopy } from "@/components/campaigns/campaign-copy";
+import { campaignCopyKey } from "@/lib/campaign-copy";
 import { campaignMembership, membershipLabel, type Campaign } from "@/lib/clipstake";
+
+function CampaignSections({ about, instructions }: { about: string; instructions: string }) {
+  const same = campaignCopyKey(about) !== "" && campaignCopyKey(about) === campaignCopyKey(instructions);
+  const showInstructions = instructions.trim().length > 0 && !same;
+  return (
+    <>
+      {about.trim() ? (
+        <section className="space-y-2">
+          <h2 className="text-xs font-medium uppercase tracking-wide text-white/40">About</h2>
+          <CampaignCopy value={about} className="text-white/80" />
+        </section>
+      ) : null}
+      {showInstructions ? (
+        <section className="space-y-2">
+          <h2 className="text-xs font-medium uppercase tracking-wide text-white/40">Instructions</h2>
+          <CampaignCopy value={instructions} className="text-white/70" />
+        </section>
+      ) : null}
+    </>
+  );
+}
 
 export default function CampaignDetailPage() {
   const params = useParams<{ id: string }>();
@@ -51,8 +74,7 @@ export default function CampaignDetailPage() {
                 <p className="text-sm text-white/45">by {campaign.brand_name}</p>
                 {membership ? <p className="mt-2 text-sm text-emerald-400">{membershipLabel(membership)}</p> : null}
               </div>
-              <p className="text-sm leading-6 text-white/80">{campaign.about}</p>
-              <p className="text-sm leading-6 text-white/60">{campaign.instructions}</p>
+              <CampaignSections about={campaign.about} instructions={campaign.instructions} />
               <dl className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
                   <dt className="text-white/40">Platforms</dt>
