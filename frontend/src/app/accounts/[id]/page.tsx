@@ -15,6 +15,37 @@ import { accountStatusNote, canSubmitAccount, type AccountList, type InstagramPo
 import { platformLabel } from "@/lib/clipstake";
 import { cn } from "@/lib/utils";
 
+function postedLabel(value: string | null): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function PostSummary({ post }: { post: InstagramPost }) {
+  const when = postedLabel(post.posted_at);
+  return (
+    <>
+      {post.thumbnail_url ? (
+        <img src={post.thumbnail_url} alt="" className="aspect-[4/5] w-full bg-muted object-cover" />
+      ) : (
+        <div className="flex aspect-[4/5] w-full items-center justify-center bg-muted text-xs text-muted-foreground">No preview</div>
+      )}
+      <div className="space-y-2 p-3">
+        <p className="line-clamp-3 text-sm leading-5">{post.caption || "No caption"}</p>
+        <p className="text-xs text-muted-foreground">
+          {post.like_count} likes · {post.comments_count} comments{when ? ` · ${when}` : ""}
+        </p>
+        {post.submitted ? (
+          <span className={cn("inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium", calm.sand.surface)}>Already submitted</span>
+        ) : (
+          <span className={cn("text-xs", calm.mist.text)}>Open post</span>
+        )}
+      </div>
+    </>
+  );
+}
+
 export default function AccountDetailPage() {
   const params = useParams<{ id: string }>();
   const [account, setAccount] = useState<PostingAccount | null>(null);
@@ -64,7 +95,7 @@ export default function AccountDetailPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8 md:py-12">
+      <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-8 md:py-12">
         <Link href="/accounts" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-4" />
           Accounts
@@ -91,23 +122,27 @@ export default function AccountDetailPage() {
             {account.platform === "instagram" ? (
               <section className="mt-6 overflow-hidden rounded-2xl border bg-card shadow-sm">
                 <div className="flex items-center justify-between gap-3 border-b px-5 py-3">
-                  <h2 className="font-display text-lg font-semibold">Posts</h2>
+                  <h2 className="font-display text-lg font-semibold">Posts{posts ? <span className="ml-2 text-sm font-medium text-muted-foreground">{posts.length}</span> : null}</h2>
                   <Button type="button" size="sm" onClick={() => void loadPosts(null)} disabled={loadingPosts}>
                     {posts ? "Refresh posts" : "Load posts"}
                   </Button>
                 </div>
                 {mediaError ? <p className="px-5 py-4 text-sm text-destructive">{mediaError}</p> : null}
                 {!posts && !mediaError ? <p className="px-5 py-8 text-sm text-muted-foreground">Load posts when you are ready. They are not fetched on every visit.</p> : null}
-                <ul>
-                  {(posts ?? []).map((post) => (
-                    <li key={post.media_id} className="border-b px-5 py-4 last:border-b-0">
-                      <p className="text-sm leading-6">{post.caption || "No caption"}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{post.like_count} likes · {post.comments_count} comments</p>
-                      {post.submitted ? <p className="mt-2 text-xs text-muted-foreground">Already submitted. It cannot be submitted again.</p> : null}
-                      {post.permalink ? <a href={post.permalink} className={cn("mt-2 block truncate text-xs underline-offset-4 hover:underline", calm.mist.text)}>{post.permalink}</a> : null}
+                {posts && posts.length === 0 ? <p className="px-5 py-8 text-sm text-muted-foreground">This account has no videos to show.</p> : null}
+                {posts && posts.length > 0 ? <ul className="grid gap-3 p-4 sm:grid-cols-3">
+                  {posts.map((post) => (
+                    <li key={post.media_id} className="overflow-hidden rounded-xl border bg-background">
+                      {post.permalink ? (
+                        <a href={post.permalink} target="_blank" rel="noopener noreferrer" className="block transition-colors hover:bg-muted/40">
+                          <PostSummary post={post} />
+                        </a>
+                      ) : (
+                        <PostSummary post={post} />
+                      )}
                     </li>
                   ))}
-                </ul>
+                </ul> : null}
                 {cursor ? (
                   <div className="flex justify-center border-t px-5 py-3">
                     <Button type="button" variant="ghost" onClick={() => void loadPosts(cursor)}>
