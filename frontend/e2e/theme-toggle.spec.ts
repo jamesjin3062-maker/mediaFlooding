@@ -45,13 +45,15 @@ test("marketing and auth pages stay light for a dark OS preference and a saved d
   await shot(page, "sign-in-saved-dark");
 });
 
-test("the app starts light, switches to dark from the sidebar, and keeps it", async ({ page }) => {
+test("the app starts dark, switches to light from the sidebar, and keeps it", async ({ page }) => {
   await signedIn(page);
   await page.goto("/list");
   await expect(page.getByRole("link", { name: /Podcast/ }).first()).toBeVisible();
-  await expect(html(page)).toHaveClass(/\blight\b/);
-  await shot(page, "library-light");
+  await expect(html(page)).toHaveClass(/\bdark\b/);
+  await shot(page, "library-dark");
 
+  await page.getByRole("button", { name: "Switch light/dark theme" }).click();
+  await expect(html(page)).toHaveClass(/\blight\b/);
   await page.getByRole("button", { name: "Switch light/dark theme" }).click();
   await expect(html(page)).toHaveClass(/\bdark\b/);
   await page.mouse.move(700, 450);

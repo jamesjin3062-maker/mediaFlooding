@@ -61,10 +61,10 @@ it("switches to light when the app starts dark", async () => {
   expect(document.documentElement).toHaveClass("light");
 });
 
-it("starts light even when the system prefers dark", () => {
+it("starts dark inside the app even when the system prefers dark", () => {
   navigation.pathname = "/list";
   render(<ThemeProvider><span /></ThemeProvider>);
-  expect(document.documentElement).toHaveClass("light");
+  expect(document.documentElement).toHaveClass("dark");
 });
 
 it("keeps marketing pages light after the app was switched to dark", () => {
