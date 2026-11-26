@@ -61,12 +61,13 @@ function formatCount(count: number): string {
   return new Intl.NumberFormat("en").format(count);
 }
 
-export function AccountsBoard() {
+export function AccountsBoard({ initialList = null }: { initialList?: AccountList | null }) {
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "account", dir: "asc" });
-  const [list, setList] = useState<AccountList | null>(null);
+  const [list, setList] = useState<AccountList | null>(initialList);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialList) return;
     let cancelled = false;
     void fetch("/api/accounts")
       .then(async (response) => {
@@ -82,7 +83,7 @@ export function AccountsBoard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialList]);
 
   async function loadMore() {
     if (!list?.next_cursor) return;

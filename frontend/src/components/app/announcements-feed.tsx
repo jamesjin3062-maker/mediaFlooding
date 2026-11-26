@@ -125,7 +125,7 @@ function AnnouncementDialog({ item, onClose }: { item: Announcement | null; onCl
 export function AnnouncementsFeed({ initialPostId = null }: { initialPostId?: string | null }) {
   const router = useRouter();
   const { data: session } = useSession();
-  const announcements = useAnnouncements();
+  const announcements = useAnnouncements(true);
   const userId = session?.user?.id;
   const [selectedId, setSelectedId] = useState<string | null>(initialPostId);
 

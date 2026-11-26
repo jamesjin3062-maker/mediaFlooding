@@ -8,14 +8,23 @@ import { CampaignMark, MembershipPill } from "@/components/campaigns/campaign-ca
 import { campaignMembership, campaignPayLabel, type Campaign, type CampaignList } from "@/lib/clipstake";
 import { canSubmitAccount, type AccountList } from "@/lib/clipstake-accounts";
 
-export function DashboardBoard() {
-  const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
-  const [accounts, setAccounts] = useState<number | null>(null);
-  const [readyAccounts, setReadyAccounts] = useState<number | null>(null);
+export function DashboardBoard({
+  initialCampaigns = null,
+  initialAccounts = null,
+}: {
+  initialCampaigns?: CampaignList | null;
+  initialAccounts?: AccountList | null;
+}) {
+  const [campaigns, setCampaigns] = useState<Campaign[] | null>(initialCampaigns?.data ?? null);
+  const [accounts, setAccounts] = useState<number | null>(initialAccounts ? initialAccounts.data.length : null);
+  const [readyAccounts, setReadyAccounts] = useState<number | null>(
+    initialAccounts ? initialAccounts.data.filter((account) => canSubmitAccount(account)).length : null,
+  );
 
   useEffect(() => {
+    if (initialCampaigns && initialAccounts) return;
     let cancelled = false;
-    void fetch("/api/campaigns")
+    if (!initialCampaigns) void fetch("/api/campaigns")
       .then(async (response) => response.ok ? response.json() as Promise<CampaignList> : null)
       .then((body) => {
         if (!cancelled) setCampaigns(body?.data ?? []);
@@ -23,7 +32,7 @@ export function DashboardBoard() {
       .catch(() => {
         if (!cancelled) setCampaigns([]);
       });
-    void fetch("/api/accounts")
+    if (!initialAccounts) void fetch("/api/accounts")
       .then(async (response) => response.ok ? response.json() as Promise<AccountList> : null)
       .then((body) => {
         if (cancelled) return;
@@ -40,7 +49,7 @@ export function DashboardBoard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialCampaigns, initialAccounts]);
 
   const open = (campaigns ?? []).filter((campaign) => campaignMembership(campaign) === "open");
 

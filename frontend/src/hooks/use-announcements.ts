@@ -19,7 +19,8 @@ function loadAnnouncements() {
   return pending;
 }
 
-export function useAnnouncements() {
+/** `live` keeps a minute poll and refreshes on focus. The bell passes false and loads once. */
+export function useAnnouncements(live = false) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   useEffect(() => {
     let cancelled = false;
@@ -28,10 +29,16 @@ export function useAnnouncements() {
       void loadAnnouncements().then(items => { if (!cancelled && items) setAnnouncements(items); });
     };
     refresh();
+    window.addEventListener(ANNOUNCEMENTS_UPDATED_EVENT, refresh);
+    if (!live) {
+      return () => {
+        cancelled = true;
+        window.removeEventListener(ANNOUNCEMENTS_UPDATED_EVENT, refresh);
+      };
+    }
     const timer = window.setInterval(refresh, 60_000);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
-    window.addEventListener(ANNOUNCEMENTS_UPDATED_EVENT, refresh);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
@@ -39,6 +46,6 @@ export function useAnnouncements() {
       document.removeEventListener("visibilitychange", refresh);
       window.removeEventListener(ANNOUNCEMENTS_UPDATED_EVENT, refresh);
     };
-  }, []);
+  }, [live]);
   return announcements;
 }

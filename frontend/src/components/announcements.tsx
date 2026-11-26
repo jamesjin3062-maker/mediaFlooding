@@ -35,7 +35,7 @@ export function Announcements({ userId, compact = false, landing = false, classN
   const key = `supoclip:announcements-read:${userId ?? "visitor"}`;
   const [read, setRead] = useState<{ key: string; ids: string[] } | null>(null);
   const [open, setOpen] = useState(false);
-  const announcements = useAnnouncements();
+  const announcements = useAnnouncements(true);
 
   useEffect(() => {
     const sync = () => setRead({ key, ids: readIds(key) });

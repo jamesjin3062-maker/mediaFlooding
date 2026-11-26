@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -17,24 +17,15 @@ import { cn } from "@/lib/utils";
 
 function PostsAction({ loading, idle, busy, onClick }: { loading: boolean; idle: string; busy: string; onClick: () => void }) {
   return (
-    <span className="relative inline-flex shrink-0 overflow-hidden rounded-full p-px">
-      <span
-        aria-hidden
-        className={cn(
-          "absolute inset-[-140%] bg-[conic-gradient(from_0deg,transparent_62%,oklch(0.55_0.05_155)_82%,transparent)] dark:bg-[conic-gradient(from_0deg,transparent_62%,oklch(0.82_0.04_155)_82%,transparent)]",
-          loading ? "opacity-0" : "animate-spin [animation-duration:2.8s]",
-        )}
-      />
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={loading}
-        className={cn("relative inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium transition hover:brightness-95 disabled:opacity-70 dark:hover:brightness-110", calm.sage.surface)}
-      >
-        {loading ? <Loader2 className="size-4 animate-spin" /> : null}
-        {loading ? busy : idle}
-      </button>
-    </span>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      className={cn("inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-medium transition hover:brightness-95 disabled:opacity-70 dark:hover:brightness-110", calm.sage.surface)}
+    >
+      {loading ? <Loader2 className="size-4 animate-spin" /> : null}
+      {loading ? busy : idle}
+    </button>
   );
 }
 
@@ -184,7 +175,7 @@ export default function AccountDetailPage() {
                 {cursor ? (
                   <div className="flex justify-center border-t px-5 py-3">
                     <Button type="button" variant="outline" onClick={() => void loadPosts(cursor)} disabled={loadingPosts}>
-                      {loadingPosts ? <Loader2 className="size-4 animate-spin" /> : <ChevronDown className="size-4 animate-bounce" />}
+                      {loadingPosts ? <Loader2 className="size-4 animate-spin" /> : null}
                       {loadingPosts ? "Loading more…" : "Load more posts"}
                     </Button>
                   </div>

@@ -6,11 +6,12 @@ import { Megaphone } from "lucide-react";
 import { CampaignCard } from "@/components/campaigns/campaign-card";
 import { campaignMembership, type Campaign, type CampaignList } from "@/lib/clipstake";
 
-export function CampaignsBoard() {
-  const [list, setList] = useState<CampaignList | null>(null);
+export function CampaignsBoard({ initialList = null }: { initialList?: CampaignList | null }) {
+  const [list, setList] = useState<CampaignList | null>(initialList);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialList) return;
     let cancelled = false;
     void fetch("/api/campaigns")
       .then(async (response) => {
@@ -27,7 +28,7 @@ export function CampaignsBoard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialList]);
 
   const campaigns = list?.data ?? [];
   const active = campaigns.filter((campaign) => campaignMembership(campaign) === "open");

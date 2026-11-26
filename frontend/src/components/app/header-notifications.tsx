@@ -48,8 +48,8 @@ function grouped(items: Announcement[]) {
 
 /** Bell menu: Inbox is unread, All is the announcement feed. */
 export function HeaderNotifications({ userId }: { userId?: string }) {
-  const announcements = useAnnouncements();
   const [open, setOpen] = useState(false);
+  const announcements = useAnnouncements(open);
   const [tab, setTab] = useState<"inbox" | "all">("inbox");
   const [filter, setFilter] = useState<"all" | "announcements">("all");
   const [read, setRead] = useState<string[]>([]);
