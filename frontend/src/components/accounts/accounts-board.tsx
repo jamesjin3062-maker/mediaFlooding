@@ -1,49 +1,74 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, Search } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { ArrowDown, ArrowUp, ChevronsUpDown, MoreHorizontal } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { campaignInitials } from "@/lib/campaign-mark";
-import { calm, platformTone } from "@/lib/calm-color";
+import { calm } from "@/lib/calm-color";
 import { accountStatusNote, canSubmitAccount, type AccountList, type PostingAccount } from "@/lib/clipstake-accounts";
-import { platformLabel } from "@/lib/clipstake";
 import { cn } from "@/lib/utils";
 
-const th = "border-b bg-muted/30 px-4 py-3 text-left text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground first:pl-5 last:pr-5";
-const td = "border-b px-4 py-4 align-middle group-last:border-b-0 first:pl-5 last:pr-5";
+type SortKey = "account" | "platform" | "followers" | "posts" | "views" | "earnings";
+type SortDir = "asc" | "desc";
 
-const TYPE_FILTERS = [
-  { id: "", label: "All" },
-  { id: "instagram", label: "Instagram" },
-  { id: "x", label: "X" },
-] as const;
+const COLUMNS: { key: SortKey; label: string }[] = [
+  { key: "account", label: "Account" },
+  { key: "platform", label: "Platform" },
+  { key: "followers", label: "Followers" },
+  { key: "posts", label: "Posts" },
+  { key: "views", label: "Views" },
+  { key: "earnings", label: "Earnings" },
+];
 
-const ORDER_FILTERS = [
-  { id: "az", label: "A–Z" },
-  { id: "za", label: "Z–A" },
-] as const;
+function platformName(platform: string): string {
+  if (platform === "instagram") return "Instagram";
+  if (platform === "x") return "Twitter";
+  return platform;
+}
 
-function formatFollowers(count: number | null): string | null {
-  if (count === null) return null;
-  return new Intl.NumberFormat("en", { notation: "compact" }).format(count);
+function statusLabel(status: string): string {
+  if (status === "connected") return "Connected";
+  if (status === "reconnect_needed") return "Reconnect";
+  if (status === "security_check") return "Security check";
+  const label = status.replaceAll("_", " ");
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function sortValue(account: PostingAccount, key: SortKey): string | number | null {
+  if (key === "account") return account.handle;
+  if (key === "platform") return platformName(account.platform);
+  if (key === "followers") return account.followers_count;
+  return null;
+}
+
+function compareAccounts(a: PostingAccount, b: PostingAccount, key: SortKey, dir: SortDir): number {
+  const left = sortValue(a, key);
+  const right = sortValue(b, key);
+  if (left === null && right === null) return 0;
+  if (left === null) return 1;
+  if (right === null) return -1;
+  const result = typeof left === "number" && typeof right === "number"
+    ? left - right
+    : String(left).localeCompare(String(right), undefined, { sensitivity: "base" });
+  return dir === "asc" ? result : -result;
+}
+
+function formatCount(count: number): string {
+  return new Intl.NumberFormat("en").format(count);
 }
 
 export function AccountsBoard() {
-  const [platform, setPlatform] = useState("");
-  const [order, setOrder] = useState<"az" | "za">("az");
-  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "account", dir: "asc" });
   const [list, setList] = useState<AccountList | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    setList(null);
-    const query = platform ? `?platform=${platform}` : "";
-    void fetch(`/api/accounts${query}`)
+    void fetch("/api/accounts")
       .then(async (response) => {
         if (!response.ok) throw new Error("Could not load accounts.");
         return response.json() as Promise<AccountList>;
@@ -57,178 +82,96 @@ export function AccountsBoard() {
     return () => {
       cancelled = true;
     };
-  }, [platform]);
+  }, []);
 
   async function loadMore() {
     if (!list?.next_cursor) return;
-    const params = new URLSearchParams({ cursor: list.next_cursor });
-    if (platform) params.set("platform", platform);
-    const response = await fetch(`/api/accounts?${params}`);
+    const response = await fetch(`/api/accounts?cursor=${encodeURIComponent(list.next_cursor)}`);
     if (!response.ok) return;
     const page = await response.json() as AccountList;
     setList({ ...page, data: [...list.data, ...page.data] });
   }
 
-  const sorted = useMemo(() => {
-    const rows = [...(list?.data ?? [])];
-    rows.sort((a, b) => a.handle.localeCompare(b.handle, undefined, { sensitivity: "base" }));
-    if (order === "za") rows.reverse();
-    return rows;
-  }, [list, order]);
+  function toggleSort(key: SortKey) {
+    setSort((current) => current.key === key
+      ? { key, dir: current.dir === "asc" ? "desc" : "asc" }
+      : { key, dir: "asc" });
+  }
+
   const accounts = useMemo(() => {
-    const needle = query.trim().replace(/^@/, "").toLowerCase();
-    if (!needle) return sorted;
-    return sorted.filter((account) => {
-      const haystack = `${account.handle} ${platformLabel(account.platform)} ${account.status.replaceAll("_", " ")}`.toLowerCase();
-      return haystack.includes(needle);
-    });
-  }, [sorted, query]);
-  const readyCount = sorted.filter((account) => canSubmitAccount(account)).length;
+    return [...(list?.data ?? [])].sort((a, b) => compareAccounts(a, b, sort.key, sort.dir));
+  }, [list, sort]);
+  const followers = accounts.reduce((sum, account) => sum + (account.followers_count ?? 0), 0);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8 md:py-12">
-      <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-xl">
-          <p className={cn("text-xs font-semibold uppercase tracking-[0.18em]", calm.mist.text)}>Clipstake</p>
-          <h1 className="mt-2 font-display text-4xl font-bold tracking-tight">Accounts</h1>
-          <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            Profiles that post your clips. A profile has to be connected before it can submit.
-          </p>
-        </div>
-        <dl className="grid grid-cols-3 gap-2 sm:gap-3">
-          <Stat label="Profiles" value={list ? String(sorted.length) : "—"} />
-          <Stat label="Ready" value={list ? String(readyCount) : "—"} />
-          <Stat label="Needs care" value={list ? String(sorted.length - readyCount) : "—"} />
-        </dl>
-      </header>
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8 md:py-10">
+      <h1 className="font-display text-2xl font-semibold tracking-tight">Accounts</h1>
+      <p className="mt-8 font-display text-5xl font-semibold tabular-nums tracking-tight">{list ? formatCount(followers) : "—"}</p>
+      <p className="mt-1 text-sm text-muted-foreground">followers</p>
 
       {error ? <p className="mt-6 text-sm text-destructive">{error}</p> : null}
       {list?.notice ? <p className="mt-4 text-xs text-muted-foreground">{list.notice}</p> : null}
 
-      <section className="mt-8 overflow-hidden rounded-2xl border bg-card shadow-sm">
-        <div className="flex flex-col gap-3 border-b px-4 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-56">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search handles"
-                aria-label="Search accounts"
-                className="h-8 rounded-full bg-background pl-9"
-              />
-            </div>
-            <p className="text-sm font-medium">{list ? `${accounts.length} shown` : "Loading profiles"}</p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <FilterGroup label="Type">
-              {TYPE_FILTERS.map((filter) => (
-                <FilterButton key={filter.id || "all"} pressed={platform === filter.id} onClick={() => setPlatform(filter.id)}>
-                  {filter.label}
-                </FilterButton>
-              ))}
-            </FilterGroup>
-            <FilterGroup label="Order">
-              {ORDER_FILTERS.map((filter) => (
-                <FilterButton key={filter.id} pressed={order === filter.id} onClick={() => setOrder(filter.id)}>
-                  {filter.label}
-                </FilterButton>
-              ))}
-            </FilterGroup>
-          </div>
+      <div className="mt-8 flex items-center gap-2 border-b pb-3">
+        <span className="text-xs font-semibold tracking-[0.16em]">ACCOUNTS</span>
+        <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs tabular-nums text-muted-foreground">{list ? accounts.length : "—"}</span>
+      </div>
+
+      {!list && !error ? <AccountTableSkeleton /> : null}
+      {list && accounts.length === 0 ? (
+        <div className="flex h-36 flex-col items-center justify-center gap-1 text-center">
+          <p className="font-display text-lg font-semibold">No profiles yet</p>
+          <p className="max-w-sm text-sm text-muted-foreground">Connect an Instagram or X profile in Clipstake, then it will show up here.</p>
         </div>
+      ) : null}
 
-        {!list && !error ? <AccountTableSkeleton /> : null}
-        {list && sorted.length === 0 ? (
-          <div className="flex h-36 flex-col items-center justify-center gap-1 px-6 text-center">
-            <p className="font-display text-lg font-semibold">No profiles yet</p>
-            <p className="max-w-sm text-sm text-muted-foreground">Connect an Instagram or X profile in Clipstake, then it will show up here.</p>
-          </div>
-        ) : null}
-        {list && sorted.length > 0 && accounts.length === 0 ? (
-          <div className="flex h-36 flex-col items-center justify-center gap-1 px-6 text-center">
-            <p className="font-display text-lg font-semibold">No matching profiles</p>
-            <p className="max-w-sm text-sm text-muted-foreground">Try another handle, or clear the search.</p>
-          </div>
-        ) : null}
+      {accounts.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[860px] border-separate border-spacing-0 text-sm">
+            <caption className="sr-only">Connected accounts</caption>
+            <thead>
+              <tr>
+                {COLUMNS.map((column) => (
+                  <th key={column.key} aria-sort={sort.key === column.key ? (sort.dir === "asc" ? "ascending" : "descending") : "none"} className="border-b px-3 py-3 text-left font-normal first:pl-0 last:pr-0">
+                    <button type="button" onClick={() => toggleSort(column.key)} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
+                      {column.label}
+                      <SortMark active={sort.key === column.key} dir={sort.dir} />
+                    </button>
+                  </th>
+                ))}
+                <th className="w-10 border-b" />
+              </tr>
+            </thead>
+            <tbody>
+              {accounts.map((account) => <AccountRow key={account.id} account={account} />)}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
 
-        {accounts.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[860px] border-separate border-spacing-0 text-sm">
-              <caption className="sr-only">Connected accounts</caption>
-              <thead>
-                <tr>
-                  <th className={cn(th, "w-14")}>#</th>
-                  <th className={th}>Account</th>
-                  <th className={th}>Platform</th>
-                  <th className={th}>Status</th>
-                  <th className={cn(th, "text-right")}>Followers</th>
-                  <th className={th}>Viewer countries</th>
-                  <th className={th}>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accounts.map((account, index) => <AccountRow key={account.id} account={account} index={index + 1} />)}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
-
-        {list?.next_cursor ? (
-          <div className="flex justify-center border-t px-4 py-3">
-            <Button type="button" variant="ghost" onClick={() => void loadMore()}>
-              Load more
-            </Button>
-          </div>
-        ) : null}
-      </section>
+      {list?.next_cursor ? (
+        <div className="flex justify-center py-4">
+          <Button type="button" variant="ghost" onClick={() => void loadMore()}>Load more</Button>
+        </div>
+      ) : null}
     </main>
   );
 }
 
-function FilterGroup({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={label}>
-      <span className="mr-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
-      {children}
-    </div>
-  );
-}
-
-function FilterButton({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={pressed}
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-colors",
-        pressed ? "border-foreground bg-foreground text-background" : "bg-background text-muted-foreground hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border bg-card px-4 py-3 shadow-sm">
-      <dt className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-display text-2xl font-bold tabular-nums tracking-tight">{value}</dd>
-    </div>
-  );
+function SortMark({ active, dir }: { active: boolean; dir: SortDir }) {
+  if (!active) return <ChevronsUpDown className="size-3.5 opacity-60" />;
+  return dir === "asc" ? <ArrowUp className="size-3.5" /> : <ArrowDown className="size-3.5" />;
 }
 
 function AccountTableSkeleton() {
   return (
-    <div className="space-y-px px-5 py-4">
-      {Array.from({ length: 4 }, (_, index) => (
-        <div key={index} className="flex items-center gap-3 border-b py-4 last:border-b-0">
-          <Skeleton className="size-10 rounded-2xl" />
+    <div className="space-y-px py-4">
+      {Array.from({ length: 3 }, (_, index) => (
+        <div key={index} className="flex items-center gap-3 border-b py-4">
+          <Skeleton className="size-9 rounded-full" />
           <div className="space-y-2">
             <Skeleton className="h-3.5 w-36" />
-            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-16" />
           </div>
         </div>
       ))}
@@ -236,65 +179,48 @@ function AccountTableSkeleton() {
   );
 }
 
-function statusLabel(status: string): string {
-  const label = status.replaceAll("_", " ");
-  return label.charAt(0).toUpperCase() + label.slice(1);
-}
-
-function viewerCountries(account: PostingAccount): { label: string; tone: string } | null {
-  if (account.viewer_locations_available === true) return { label: "On file", tone: calm.sage.surface };
-  if (account.viewer_locations_available === false) return { label: "Missing", tone: calm.sand.surface };
-  return null;
-}
-
-function AccountMark({ account }: { account: PostingAccount }) {
-  return (
-    <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-2xl font-display text-sm font-bold", platformTone(account.platform))}>
-      {campaignInitials(account.handle)}
-    </span>
-  );
-}
-
-function AccountRow({ account, index }: { account: PostingAccount; index: number }) {
-  const note = accountStatusNote(account);
-  const followers = formatFollowers(account.followers_count);
+function AccountRow({ account }: { account: PostingAccount }) {
   const ready = canSubmitAccount(account);
-  const countries = viewerCountries(account);
+  const note = accountStatusNote(account);
   return (
-    <tr className="group transition-colors hover:bg-[oklch(0.97_0.012_235)] dark:hover:bg-[oklch(0.24_0.015_235)]">
-      <td className={cn(td, "w-14 tabular-nums text-muted-foreground")}>{index}</td>
-      <td className={td}>
-        <Link href={`/accounts/${account.id}`} className="flex w-full items-center gap-3">
-          <AccountMark account={account} />
-          <span className="min-w-0">
-            <span className="block truncate font-display text-base font-semibold tracking-tight group-hover:underline">@{account.handle}</span>
+    <tr className="group">
+      <td className="border-b py-4 pr-3">
+        <Link href={`/accounts/${account.id}`} className="flex items-center gap-3">
+          <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
+            {campaignInitials(account.handle)}
+            <span className="absolute -bottom-0.5 -left-0.5 flex size-4 items-center justify-center rounded-full bg-background text-[9px] font-bold ring-2 ring-background">
+              {account.platform === "x" ? "𝕏" : account.platform === "instagram" ? "Ig" : account.platform.slice(0, 1).toUpperCase()}
+            </span>
           </span>
-          <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+          <span className="min-w-0">
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="truncate font-medium">@{account.handle}</span>
+              <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", ready ? calm.sage.surface : calm.sand.surface)}>
+                {statusLabel(account.status)}
+              </span>
+            </span>
+            {note ? <span className="mt-0.5 block truncate text-xs text-muted-foreground">{note}</span> : null}
+          </span>
         </Link>
       </td>
-      <td className={td}>
-        <span className={cn("inline-flex rounded-full px-2.5 py-1 text-xs font-medium", platformTone(account.platform))}>
-          {platformLabel(account.platform)}
-        </span>
-      </td>
-      <td className={td}>
-        <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium", ready ? calm.sage.surface : calm.sand.surface)}>
-          <span className={cn("size-1.5 rounded-full", ready ? calm.sage.dot : calm.sand.dot)} />
-          {statusLabel(account.status)}
-        </span>
-      </td>
-      <td className={cn(td, "text-right font-display text-base font-semibold tabular-nums")}>
-        {followers ?? <span className="font-sans text-sm font-normal text-muted-foreground">—</span>}
-      </td>
-      <td className={td}>
-        {countries ? (
-          <span className={cn("inline-flex rounded-full px-2.5 py-1 text-xs font-medium", countries.tone)}>{countries.label}</span>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
-      </td>
-      <td className={cn(td, "max-w-xs text-xs leading-5")}>
-        <span className={cn("line-clamp-2", note ? "text-muted-foreground" : calm.sage.text)}>{note ?? "Ready to submit"}</span>
+      <td className="border-b px-3 text-muted-foreground">{platformName(account.platform)}</td>
+      <td className="border-b px-3 tabular-nums text-muted-foreground">{account.followers_count === null ? "—" : formatCount(account.followers_count)}</td>
+      <td className="border-b px-3 text-muted-foreground">—</td>
+      <td className="border-b px-3 text-muted-foreground">—</td>
+      <td className={cn("border-b px-3", calm.sage.text)}>—</td>
+      <td className="border-b pl-3 text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button type="button" aria-label={`Actions for @${account.handle}`} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground">
+              <MoreHorizontal className="size-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link href={`/accounts/${account.id}`}>Open account</Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </td>
     </tr>
   );
