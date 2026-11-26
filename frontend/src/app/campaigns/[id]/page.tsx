@@ -1,14 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app/app-shell";
 import { CampaignMark, MembershipPill } from "@/components/campaigns/campaign-card";
 import { CampaignCopy } from "@/components/campaigns/campaign-copy";
 import { campaignCopyKey } from "@/lib/campaign-copy";
-import { campaignMembership, geoRateLabel, platformLabel, postingRule, type Campaign } from "@/lib/clipstake";
+import { campaignMembership, geoRateLabel, getCampaign, platformLabel, postingRule } from "@/lib/clipstake";
+import { noIndexMetadata } from "@/lib/seo";
+
+export const metadata = noIndexMetadata;
 
 function CampaignSections({ about, instructions }: { about: string; instructions: string }) {
   const same = campaignCopyKey(about) !== "" && campaignCopyKey(about) === campaignCopyKey(instructions);
@@ -31,30 +30,10 @@ function CampaignSections({ about, instructions }: { about: string; instructions
   );
 }
 
-export default function CampaignDetailPage() {
-  const params = useParams<{ id: string }>();
-  const [campaign, setCampaign] = useState<Campaign | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    void fetch(`/api/campaigns/${params.id}`)
-      .then(async (response) => {
-        const body = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(body.error || "Could not load that campaign.");
-        return body.campaign as Campaign;
-      })
-      .then((body) => {
-        if (!cancelled) setCampaign(body);
-      })
-      .catch((loadError: Error) => {
-        if (!cancelled) setError(loadError.message);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [params.id]);
-
+export default async function CampaignDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const result = await getCampaign(id).catch(() => null);
+  const campaign = result?.campaign ?? null;
   const membership = campaign ? campaignMembership(campaign) : null;
   const posting = campaign ? postingRule(campaign) : null;
 
@@ -62,8 +41,8 @@ export default function CampaignDetailPage() {
     <AppShell>
       <main className="w-full px-4 py-8 sm:px-6 md:py-10">
         <Link href="/campaigns" className="text-sm text-muted-foreground hover:text-foreground">Campaigns</Link>
-        {error ? <p className="mt-6 text-sm text-destructive">{error}</p> : null}
-        {!campaign && !error ? <p className="mt-6 text-sm text-muted-foreground">Loading campaign…</p> : null}
+        {result && !campaign ? <p className="mt-6 text-sm text-destructive">No such campaign.</p> : null}
+        {!result ? <p className="mt-6 text-sm text-destructive">Could not load that campaign.</p> : null}
         {campaign ? (
           <article className="mt-4 overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm">
             <div className="flex items-start gap-4 px-5 py-6">
