@@ -60,8 +60,8 @@ export function CampaignsBoard() {
         </h2>
         {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
         {!list && !error ? <p className="mt-3 text-sm text-muted-foreground">Loading campaigns…</p> : null}
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {campaigns.map((campaign: Campaign) => <CampaignCard key={campaign.id} campaign={campaign} />)}
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {campaigns.map((campaign: Campaign) => <CampaignCard key={campaign.id} campaign={campaign} compact />)}
         </div>
         {list?.notice ? <p className="mt-4 text-xs text-muted-foreground">{list.notice}</p> : null}
       </section>

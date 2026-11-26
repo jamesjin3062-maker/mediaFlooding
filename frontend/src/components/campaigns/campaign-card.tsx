@@ -24,19 +24,19 @@ export function MembershipPill({ membership }: { membership: CampaignMembership 
   );
 }
 
-export function CampaignCard({ campaign }: { campaign: Campaign }) {
+export function CampaignCard({ campaign, compact = false }: { campaign: Campaign; compact?: boolean }) {
   const membership = campaignMembership(campaign);
   const pay = campaignPayLabel(campaign);
   return (
-    <Link href={`/campaigns/${campaign.id}`} className="group flex min-h-44 flex-col rounded-xl border bg-card p-4 text-card-foreground shadow-sm transition-colors hover:border-foreground/20">
+    <Link href={`/campaigns/${campaign.id}`} className={cn("group flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm transition-colors hover:border-foreground/20", compact ? "min-h-36 p-3" : "min-h-44 p-4")}>
       <div className="flex items-start justify-between gap-3">
-        <CampaignMark name={campaign.brand_name} />
+        <CampaignMark name={campaign.brand_name} className={compact ? "size-9 rounded-lg text-xs" : undefined} />
         <MembershipPill membership={membership} />
       </div>
-      <div className="mt-auto pt-6">
-        <h3 className="line-clamp-2 font-display text-base font-semibold leading-5">{campaign.name}</h3>
-        <p className="mt-1 truncate text-sm text-muted-foreground">{campaign.brand_name}</p>
-        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      <div className={cn("mt-auto", compact ? "pt-4" : "pt-6")}>
+        <h3 className={cn("line-clamp-2 font-display font-semibold leading-5", compact ? "text-sm" : "text-base")}>{campaign.name}</h3>
+        <p className={cn("mt-1 truncate text-muted-foreground", compact ? "text-xs" : "text-sm")}>{campaign.brand_name}</p>
+        <div className={cn("flex flex-wrap items-center gap-1.5", compact ? "mt-2" : "mt-3")}>
           {campaign.platforms.map((item) => (
             <span key={item.platform} className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">{platformLabel(item.platform)}</span>
           ))}
