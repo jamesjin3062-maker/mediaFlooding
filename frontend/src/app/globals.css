@@ -262,3 +262,12 @@ nextjs-portal { display: none !important; }
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
 }
+
+@keyframes landing-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.landing-marquee { animation: landing-marquee 36s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .landing-marquee { animation: none; }
+}

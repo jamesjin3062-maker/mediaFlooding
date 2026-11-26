@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import LandingPage from "@/components/landing-page";
-import { getLandingFaqs } from "@/lib/landing-faq";
+import { LANDING_FAQS } from "@/lib/media-flooding-landing";
 import { APP_STORE_URL, COMPANY_NAME, getSiteUrl } from "@/lib/site";
 
 const siteUrl = getSiteUrl();
@@ -103,7 +103,7 @@ export default async function HomePage() {
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntity: getLandingFaqs(t).map((faq) => ({
+      mainEntity: LANDING_FAQS.map((faq) => ({
         "@type": "Question",
         name: faq.question,
         acceptedAnswer: { "@type": "Answer", text: faq.answer },
