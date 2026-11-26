@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ArrowRight, Check, ChevronDown, ShieldCheck } from "lucide-react";
 
 import { MediaFloodingLogo } from "@/components/app/media-flooding-logo";
+import { useSession } from "@/lib/auth-client";
 import { LANDING_FAQS } from "@/lib/media-flooding-landing";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +32,26 @@ const CHECKS = [
   { title: "Re-checked", body: "Live posts are looked at again, so a later spike still has to hold up." },
 ];
 
-const lime = "inline-flex h-11 items-center gap-2 rounded-xl bg-[oklch(0.89_0.19_128)] px-4 text-sm font-semibold text-[oklch(0.2_0.03_130)] hover:brightness-105";
+const cta = "inline-flex h-11 items-center gap-2 rounded-[11px] bg-white px-4 text-sm font-semibold text-[oklch(0.22_0.05_255)] hover:bg-[oklch(0.94_0.03_230)]";
+
+function GetStarted({ featured = false, compact = false }: { featured?: boolean; compact?: boolean }) {
+  const { data: session } = useSession();
+  const href = session?.user ? "/dashboard" : "/sign-in";
+  return (
+    <Link href={href} className={cn("group relative inline-flex rounded-xl transition-transform duration-500 hover:-translate-y-0.5 active:translate-y-0", featured && "p-[2px] hover:scale-[1.04]")}>
+      {featured ? (
+        <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl">
+          <span className="landing-cta-spin absolute left-1/2 top-1/2 h-[240%] w-[240%] bg-[conic-gradient(from_0deg,transparent_0_55%,oklch(0.78_0.16_230)_78%,white_100%)]" />
+        </span>
+      ) : null}
+      <span className={cn(cta, "relative overflow-hidden", compact && "h-8 gap-1.5 rounded-lg px-2.5 text-xs", featured && "landing-cta-glow")}>
+        {featured ? <span aria-hidden className="landing-cta-sheen pointer-events-none absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-transparent via-[oklch(0.75_0.12_230)] to-transparent opacity-80" /> : null}
+        <span className="relative">Get Started</span>
+        <ArrowRight className={cn("relative size-4 transition-transform duration-500 group-hover:translate-x-1.5", compact && "size-3.5")} />
+      </span>
+    </Link>
+  );
+}
 
 export default function LandingPage() {
   return (
@@ -39,10 +59,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[oklch(0.145_0.004_260)]/90 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5">
           <Link href="/" aria-label="Media Flooding"><MediaFloodingLogo className="text-white [&_.text-muted-foreground]:text-white/60" /></Link>
-          <div className="flex items-center gap-2">
-            <Link href="/sign-in" className="hidden h-10 items-center px-3 text-sm text-white/70 hover:text-white sm:inline-flex">Sign in</Link>
-            <Link href="/sign-up" className={lime}>Start clipping</Link>
-          </div>
+          <GetStarted compact />
         </div>
       </header>
 
@@ -55,13 +72,12 @@ export default function LandingPage() {
           <p className="mt-6 max-w-xl text-base leading-7 text-white/65 sm:text-lg">
             Browse funded briefs, post on the Instagram and X accounts you already run, and let verified views turn into a balance.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link href="/sign-up" className={lime}>Start clipping <ArrowRight className="size-4" /></Link>
-            <Link href="/sign-in" className="inline-flex h-11 items-center rounded-xl px-4 text-sm font-medium text-white/80 hover:bg-white/5">Sign in</Link>
+          <div className="mt-8">
+            <GetStarted featured />
           </div>
         </section>
 
-        <div className="overflow-hidden border-y border-white/10 py-4">
+        <div className="mx-4 overflow-hidden rounded-full border border-white/10 py-4 sm:mx-8">
           <div className="landing-marquee flex w-max gap-3 px-3">
             {[...PAYOUTS, ...PAYOUTS].map((amount, index) => (
               <span key={`${amount}-${index}`} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/80">
@@ -137,9 +153,8 @@ export default function LandingPage() {
         </section>
 
         <section className="border-t border-white/10">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-16 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto max-w-6xl px-5 py-16">
             <h2 className="font-display text-3xl font-semibold tracking-tight">Pick a brief and post.</h2>
-            <Link href="/sign-up" className={lime}>Start clipping <ArrowRight className="size-4" /></Link>
           </div>
         </section>
       </main>
@@ -147,10 +162,6 @@ export default function LandingPage() {
       <footer className="border-t border-white/10 px-5 py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <MediaFloodingLogo className="text-white [&_.text-muted-foreground]:text-white/60" />
-          <div className="flex gap-4">
-            <Link href="/sign-in" className="hover:text-white">Sign in</Link>
-            <Link href="/sign-up" className="hover:text-white">Create account</Link>
-          </div>
         </div>
       </footer>
     </div>
