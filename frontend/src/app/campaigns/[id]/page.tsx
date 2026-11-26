@@ -60,7 +60,7 @@ export default function CampaignDetailPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-8 md:py-10">
+      <main className="w-full px-4 py-8 sm:px-6 md:py-10">
         <Link href="/campaigns" className="text-sm text-muted-foreground hover:text-foreground">Campaigns</Link>
         {error ? <p className="mt-6 text-sm text-destructive">{error}</p> : null}
         {!campaign && !error ? <p className="mt-6 text-sm text-muted-foreground">Loading campaign…</p> : null}
