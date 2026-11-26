@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Skeleton } from "@/components/ui/skeleton";
 import { campaignInitials } from "@/lib/campaign-mark";
 import { calm } from "@/lib/calm-color";
-import { accountStatusNote, canSubmitAccount, type AccountList, type PostingAccount } from "@/lib/clipstake-accounts";
+import { canSubmitAccount, type AccountList, type PostingAccount } from "@/lib/clipstake-accounts";
 import { cn } from "@/lib/utils";
 
 type SortKey = "account" | "platform" | "followers" | "posts" | "views" | "earnings";
@@ -104,15 +104,15 @@ export function AccountsBoard() {
   const followers = accounts.reduce((sum, account) => sum + (account.followers_count ?? 0), 0);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8 md:py-10">
+    <main className="w-full px-4 py-4 md:px-6 md:py-5">
       <h1 className="font-display text-2xl font-semibold tracking-tight">Accounts</h1>
-      <p className="mt-8 font-display text-5xl font-semibold tabular-nums tracking-tight">{list ? formatCount(followers) : "—"}</p>
+      <p className="mt-4 font-display text-5xl font-semibold tabular-nums tracking-tight">{list ? formatCount(followers) : "—"}</p>
       <p className="mt-1 text-sm text-muted-foreground">followers</p>
 
       {error ? <p className="mt-6 text-sm text-destructive">{error}</p> : null}
       {list?.notice ? <p className="mt-4 text-xs text-muted-foreground">{list.notice}</p> : null}
 
-      <div className="mt-8 flex items-center gap-2 border-b pb-3">
+      <div className="mt-5 flex items-center gap-2 border-b pb-2">
         <span className="text-xs font-semibold tracking-[0.16em]">ACCOUNTS</span>
         <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs tabular-nums text-muted-foreground">{list ? accounts.length : "—"}</span>
       </div>
@@ -132,7 +132,7 @@ export function AccountsBoard() {
             <thead>
               <tr>
                 {COLUMNS.map((column) => (
-                  <th key={column.key} aria-sort={sort.key === column.key ? (sort.dir === "asc" ? "ascending" : "descending") : "none"} className="border-b px-3 py-3 text-left font-normal first:pl-0 last:pr-0">
+                  <th key={column.key} aria-sort={sort.key === column.key ? (sort.dir === "asc" ? "ascending" : "descending") : "none"} className="border-b px-2 py-2 text-left font-normal first:pl-0 last:pr-0">
                     <button type="button" onClick={() => toggleSort(column.key)} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
                       {column.label}
                       <SortMark active={sort.key === column.key} dir={sort.dir} />
@@ -167,7 +167,7 @@ function AccountTableSkeleton() {
   return (
     <div className="space-y-px py-4">
       {Array.from({ length: 3 }, (_, index) => (
-        <div key={index} className="flex items-center gap-3 border-b py-4">
+        <div key={index} className="flex items-center gap-3 border-b py-2">
           <Skeleton className="size-9 rounded-full" />
           <div className="space-y-2">
             <Skeleton className="h-3.5 w-36" />
@@ -179,35 +179,51 @@ function AccountTableSkeleton() {
   );
 }
 
+function PlatformMark({ platform }: { platform: string }) {
+  if (platform === "instagram") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-2.5" aria-hidden>
+        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2.4" />
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2.4" />
+        <circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" />
+      </svg>
+    );
+  }
+  if (platform === "x") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-2.5" aria-hidden>
+        <path fill="currentColor" d="M4 4h4.2l3.7 5.2L16.2 4H20l-6.3 8.1L20.4 20h-4.2l-4.1-5.7L7.4 20H3.6l6.7-8.6L4 4Z" />
+      </svg>
+    );
+  }
+  return <span className="text-[9px] font-bold leading-none">{platform.slice(0, 1).toUpperCase()}</span>;
+}
+
 function AccountRow({ account }: { account: PostingAccount }) {
   const ready = canSubmitAccount(account);
-  const note = accountStatusNote(account);
   return (
     <tr className="group">
-      <td className="border-b py-4 pr-3">
+      <td className="border-b py-2 pr-2">
         <Link href={`/accounts/${account.id}`} className="flex items-center gap-3">
           <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
             {campaignInitials(account.handle)}
-            <span className="absolute -bottom-0.5 -left-0.5 flex size-4 items-center justify-center rounded-full bg-background text-[9px] font-bold ring-2 ring-background">
-              {account.platform === "x" ? "𝕏" : account.platform === "instagram" ? "Ig" : account.platform.slice(0, 1).toUpperCase()}
+            <span aria-hidden className="absolute -bottom-0.5 -left-0.5 flex size-4 items-center justify-center rounded-full bg-background text-foreground ring-2 ring-background">
+              <PlatformMark platform={account.platform} />
             </span>
           </span>
-          <span className="min-w-0">
-            <span className="flex flex-wrap items-center gap-2">
-              <span className="truncate font-medium">@{account.handle}</span>
-              <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", ready ? calm.sage.surface : calm.sand.surface)}>
-                {statusLabel(account.status)}
-              </span>
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="truncate font-medium">@{account.handle}</span>
+            <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium", ready ? calm.sage.surface : calm.sand.surface)}>
+              {statusLabel(account.status)}
             </span>
-            {note ? <span className="mt-0.5 block truncate text-xs text-muted-foreground">{note}</span> : null}
           </span>
         </Link>
       </td>
-      <td className="border-b px-3 text-muted-foreground">{platformName(account.platform)}</td>
-      <td className="border-b px-3 tabular-nums text-muted-foreground">{account.followers_count === null ? "—" : formatCount(account.followers_count)}</td>
-      <td className="border-b px-3 text-muted-foreground">—</td>
-      <td className="border-b px-3 text-muted-foreground">—</td>
-      <td className={cn("border-b px-3", calm.sage.text)}>—</td>
+      <td className="border-b px-2 py-2 text-muted-foreground">{platformName(account.platform)}</td>
+      <td className="border-b px-2 py-2 tabular-nums text-muted-foreground">{account.followers_count === null ? "—" : formatCount(account.followers_count)}</td>
+      <td className="border-b px-2 py-2 text-muted-foreground">—</td>
+      <td className="border-b px-2 py-2 text-muted-foreground">—</td>
+      <td className={cn("border-b px-2 py-2", calm.sage.text)}>—</td>
       <td className="border-b pl-3 text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

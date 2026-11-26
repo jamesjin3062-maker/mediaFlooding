@@ -17,7 +17,7 @@ import { getUpgradeState } from "@/components/billing/upgrade-prompt";
 import { fetchGenerations, timeAgo, type GenerationSummary } from "@/lib/generations";
 import { StatusBadge } from "@/components/app/status-badge";
 import { HeaderNotifications } from "@/components/app/header-notifications";
-import { MediaFloodingLogo, shellTitle } from "@/components/app/media-flooding-logo";
+import { MediaFloodingLogo } from "@/components/app/media-flooding-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppTheme } from "@/components/theme-provider";
 import { availableWorkflows, useWorkflowsInfo } from "@/components/workflow-picker";
@@ -106,19 +106,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div data-app-shell={user ? "" : undefined} className={cn(user && "flex min-h-dvh bg-canvas")}>
+    <div data-app-shell={user ? "" : undefined} className={cn(user && "flex min-h-dvh flex-col bg-canvas")}>
+      {user && !immersive ? <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-sidebar-border bg-sidebar px-4">
+        <Link href="/dashboard" aria-label="Media Flooding" className="flex items-center">
+          <MediaFloodingLogo compact className="md:hidden" />
+          <MediaFloodingLogo className="hidden md:flex" />
+        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <HeaderNotifications userId={user.id} />
+          <Link href="/submissions" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[oklch(0.89_0.19_128)] px-3 text-sm font-semibold text-[oklch(0.2_0.03_130)] hover:brightness-105">
+            <Plus className="size-4" />
+            Submit Post
+          </Link>
+        </div>
+      </header> : null}
+
+      <div className={cn(user && "flex min-h-0 flex-1")}>
       {user ? <aside
         className={cn(
-          "sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-sidebar-border bg-sidebar",
+          "sticky top-14 hidden shrink-0 flex-col border-r border-sidebar-border bg-sidebar",
           !immersive && "md:flex",
+          immersive ? "top-0 h-dvh" : "h-[calc(100dvh-3.5rem)]",
           compact ? "w-16 items-center px-2" : "w-60 px-3",
         )}
       >
-        <Link href="/dashboard" className={cn("flex h-14 items-center", compact ? "justify-center" : "px-2")} aria-label="Media Flooding">
-          <MediaFloodingLogo compact={compact} />
-        </Link>
-
-        <nav aria-label={t("search.mainNav")} className="flex min-h-0 w-full flex-1 flex-col gap-0.5 overflow-y-auto">
+        <nav aria-label={t("search.mainNav")} className="flex min-h-0 w-full flex-1 flex-col gap-0.5 overflow-y-auto pt-3">
           {topItems.map((item) => (
             <SidebarLink key={item.href} compact={compact} href={item.href} label={item.label} active={item.match(pathname)}>
               <item.icon className="size-4" />
@@ -176,23 +188,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside> : null}
 
       <div className={cn(user && "flex min-w-0 flex-1 flex-col", user && !immersive && "pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0")}>
-        {user && !immersive ? <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b bg-background/80 px-4 backdrop-blur">
-          <div className="flex min-w-0 items-center gap-3">
-            <Link href="/dashboard" className="md:hidden" aria-label="Media Flooding">
-              <MediaFloodingLogo compact />
-            </Link>
-            <p className="truncate font-display text-lg font-semibold tracking-tight">{shellTitle(pathname)}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <ThemeToggle tooltipSide="bottom" className="rounded-lg p-2 hover:bg-accent [&_svg]:size-5" />
-            <HeaderNotifications userId={user.id} />
-            <Link href="/submissions" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[oklch(0.89_0.19_128)] px-3 text-sm font-semibold text-[oklch(0.2_0.03_130)] hover:brightness-105">
-              <Plus className="size-4" />
-              Submit Post
-            </Link>
-          </div>
-        </header> : null}
         {children}
+      </div>
       </div>
 
       {user && !immersive ? <nav aria-label={t("search.mobileNav")} className="fixed inset-x-0 bottom-0 z-40 flex overflow-x-auto border-t bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
@@ -244,7 +241,7 @@ function SidebarLink({ href, label, active, compact, shortcut, className, childr
       className={cn(
         "flex h-9 w-full items-center gap-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         compact ? "justify-center" : "px-2.5",
-        active ? "bg-background text-foreground shadow-xs ring-1 ring-sidebar-border" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+        active ? "bg-sidebar-accent text-foreground" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
         className,
       )}
     >
