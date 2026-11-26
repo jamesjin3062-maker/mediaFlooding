@@ -56,12 +56,6 @@ export async function generateMetadata(): Promise<Metadata> {
   creator: "SupoClip Team",
   publisher: COMPANY_NAME,
   category: t("category"),
-  // icons: {
-  //   icon: "/icon.png",
-  // },
-  icons: {
-    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-  },
   itunes: {
     appId: APP_STORE_ID,
   },
