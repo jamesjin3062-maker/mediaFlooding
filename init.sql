@@ -267,10 +267,10 @@ CREATE INDEX IF NOT EXISTS "announcements_is_published_published_at_idx"
 INSERT INTO "announcements" ("id", "title", "description", "href", "action", "is_published", "published_at")
 VALUES (
     'creator-program-2026-10',
-    'The creator program is open',
-    'Make content about SupoClip and get hosted Pro for free while participating as an approved creator. Your audience gets 20% off their first three months. No cash payments or referral commissions.',
-    '/affiliate',
-    'Explore the creator program',
+    'Campaigns are open',
+    'Open campaigns are ready for clips. Review a brief, post it, and submit the link.',
+    '/announcements',
+    'View announcements',
     true,
     '2026-10-09T00:00:00Z'
 )

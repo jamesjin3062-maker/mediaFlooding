@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -17,6 +16,8 @@ import { billingPlanMessageKey } from "@/lib/billing-plans";
 import { getUpgradeState } from "@/components/billing/upgrade-prompt";
 import { fetchGenerations, timeAgo, type GenerationSummary } from "@/lib/generations";
 import { StatusBadge } from "@/components/app/status-badge";
+import { HeaderNotifications } from "@/components/app/header-notifications";
+import { MediaFloodingLogo, shellTitle } from "@/components/app/media-flooding-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppTheme } from "@/components/theme-provider";
 import { availableWorkflows, useWorkflowsInfo } from "@/components/workflow-picker";
@@ -113,10 +114,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           compact ? "w-16 items-center px-2" : "w-60 px-3",
         )}
       >
-        {/* <Link href="/" className={cn("flex h-14 items-center gap-2 font-display text-lg font-bold tracking-tight", compact ? "justify-center" : "px-2")}> */}
-        <Link href="/" className={cn("invisible flex h-14 items-center gap-2 font-display text-lg font-bold tracking-tight", compact ? "justify-center" : "px-2")}>
-          <Image src="/logo.png" alt="" width={24} height={24} className="size-6 dark:invert" priority />
-          {!compact && "SupoClip"}
+        <Link href="/dashboard" className={cn("flex h-14 items-center", compact ? "justify-center" : "px-2")} aria-label="Media Flooding">
+          <MediaFloodingLogo compact={compact} />
         </Link>
 
         <nav aria-label={t("search.mainNav")} className="flex min-h-0 w-full flex-1 flex-col gap-0.5 overflow-y-auto">
@@ -177,17 +176,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside> : null}
 
       <div className={cn(user && "flex min-w-0 flex-1 flex-col", user && !immersive && "pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0")}>
-        {user && !immersive ? <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur md:hidden">
-          {/* <Link href="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight"> */}
-          <Link href="/" className="invisible flex items-center gap-2 font-display text-lg font-bold tracking-tight">
-            <Image src="/logo.png" alt="" width={22} height={22} className="size-[22px] dark:invert" />SupoClip
-          </Link>
-          <div className="flex items-center gap-1">
-            {/* <Announcements key={user.id} userId={user.id} compact /> */}
+        {user && !immersive ? <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b bg-background/80 px-4 backdrop-blur">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link href="/dashboard" className="md:hidden" aria-label="Media Flooding">
+              <MediaFloodingLogo compact />
+            </Link>
+            <p className="truncate font-display text-lg font-semibold tracking-tight">{shellTitle(pathname)}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             <ThemeToggle tooltipSide="bottom" className="rounded-lg p-2 hover:bg-accent [&_svg]:size-5" />
-            <button type="button" onClick={() => setPaletteOpen(true)} aria-label={t("search.generations")} className="rounded-lg p-2 text-muted-foreground hover:bg-accent">
-              <Search className="size-5" />
-            </button>
+            <HeaderNotifications userId={user.id} />
+            <Link href="/submissions" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[oklch(0.89_0.19_128)] px-3 text-sm font-semibold text-[oklch(0.2_0.03_130)] hover:brightness-105">
+              <Plus className="size-4" />
+              Submit Post
+            </Link>
           </div>
         </header> : null}
         {children}
