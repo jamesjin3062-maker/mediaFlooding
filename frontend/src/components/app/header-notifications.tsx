@@ -6,26 +6,11 @@ import { Bell, Check, Megaphone } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAnnouncements } from "@/hooks/use-announcements";
+import { ANNOUNCEMENTS_READ_EVENT, forgetAnnouncementReadCache, markAnnouncementsRead, readAnnouncementIds } from "@/lib/announcement-reads";
 import type { Announcement } from "@/lib/announcements";
 import { cn } from "@/lib/utils";
 
-const READ_EVENT = "supoclip:announcements-read";
-const memoryRead = new Map<string, string[]>();
 const GROUPS = ["TODAY", "THIS WEEK", "EARLIER"] as const;
-
-function storageKey(userId?: string) {
-  return `supoclip:announcements-read:${userId ?? "visitor"}`;
-}
-
-function readIds(key: string): string[] {
-  if (memoryRead.has(key)) return memoryRead.get(key)!;
-  try {
-    const value: unknown = JSON.parse(window.localStorage.getItem(key) ?? "[]");
-    return Array.isArray(value) ? value.filter((id): id is string => typeof id === "string") : [];
-  } catch {
-    return memoryRead.get(key) ?? [];
-  }
-}
 
 function shortAge(iso: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000));
@@ -63,7 +48,6 @@ function grouped(items: Announcement[]) {
 
 /** Bell menu: Inbox is unread, All is the announcement feed. */
 export function HeaderNotifications({ userId }: { userId?: string }) {
-  const key = storageKey(userId);
   const announcements = useAnnouncements();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"inbox" | "all">("inbox");
@@ -71,34 +55,27 @@ export function HeaderNotifications({ userId }: { userId?: string }) {
   const [read, setRead] = useState<string[]>([]);
 
   useEffect(() => {
-    const sync = () => setRead(readIds(key));
+    const sync = () => setRead(readAnnouncementIds(userId));
     sync();
     const syncStorage = (event: StorageEvent) => {
-      if (event.key !== null && event.key !== key) return;
-      memoryRead.delete(key);
+      if (event.key !== null && event.key !== `supoclip:announcements-read:${userId ?? "visitor"}`) return;
+      forgetAnnouncementReadCache(userId);
       sync();
     };
     window.addEventListener("storage", syncStorage);
-    window.addEventListener(READ_EVENT, sync);
+    window.addEventListener(ANNOUNCEMENTS_READ_EVENT, sync);
     return () => {
       window.removeEventListener("storage", syncStorage);
-      window.removeEventListener(READ_EVENT, sync);
+      window.removeEventListener(ANNOUNCEMENTS_READ_EVENT, sync);
     };
-  }, [key]);
+  }, [userId]);
 
   const unread = announcements.filter((item) => !read.includes(item.id));
   const source = tab === "inbox" ? unread : announcements;
   const visible = grouped(source);
   const markRead = (id: string) => {
-    const ids = [...new Set([...read, id])];
-    setRead(ids);
-    try {
-      window.localStorage.setItem(key, JSON.stringify(ids));
-      memoryRead.delete(key);
-    } catch {
-      memoryRead.set(key, ids);
-    }
-    window.dispatchEvent(new Event(READ_EVENT));
+    markAnnouncementsRead(userId, [id]);
+    setRead(readAnnouncementIds(userId));
   };
 
   return (
@@ -164,7 +141,7 @@ export function HeaderNotifications({ userId }: { userId?: string }) {
                 {group.items.map((item) => (
                   <Link
                     key={item.id}
-                    href="/announcements"
+                    href={`/announcements?post=${encodeURIComponent(item.id)}`}
                     onClick={() => { markRead(item.id); setOpen(false); }}
                     className="flex gap-3 rounded-xl px-2 py-2.5 hover:bg-muted/70"
                   >

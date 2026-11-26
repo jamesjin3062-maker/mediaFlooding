@@ -4,10 +4,11 @@ import { noIndexMetadata } from "@/lib/seo";
 
 export const metadata = noIndexMetadata;
 
-export default function AnnouncementsPage() {
+export default async function AnnouncementsPage({ searchParams }: { searchParams: Promise<{ post?: string }> }) {
+  const { post } = await searchParams;
   return (
     <AppShell>
-      <AnnouncementsFeed />
+      <AnnouncementsFeed initialPostId={post ?? null} />
     </AppShell>
   );
 }
