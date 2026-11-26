@@ -5,15 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowRight, BadgeDollarSign, Bell, ChevronRight, CornerDownLeft, Film, Gift, LayoutDashboard, ListChecks, ListOrdered, LogOut, Megaphone, MessageSquare, Play, Plus, Scissors, Search, Send, Settings, Share2, Shield, Sparkles, Target, Trophy, Users, Wallet,
+  BadgeDollarSign, Bell, ChevronRight, CornerDownLeft, Film, Gift, LayoutDashboard, ListChecks, ListOrdered, LogOut, Megaphone, MessageSquare, Play, Plus, Scissors, Search, Send, Settings, Share2, Shield, Sparkles, Target, Trophy, Users, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { signOut, useSession } from "@/lib/auth-client";
 import { resetAnalytics } from "@/lib/posthog";
-import { useBillingSummary } from "@/hooks/use-billing-summary";
 import { useSocialAccess } from "@/hooks/use-social-access";
-import { billingPlanMessageKey } from "@/lib/billing-plans";
-import { getUpgradeState } from "@/components/billing/upgrade-prompt";
 import { fetchGenerations, timeAgo, type GenerationSummary } from "@/lib/generations";
 import { StatusBadge } from "@/components/app/status-badge";
 import { HeaderNotifications } from "@/components/app/header-notifications";
@@ -49,7 +46,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [billing] = useBillingSummary(Boolean(session?.user));
   // The editor is a full-screen workspace with its own back button: no app
   // chrome there. Elements stay in place (hidden) so children keep their position.
   const immersive = /^\/tasks\/[^/]+\/edit/.test(pathname);
@@ -72,8 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const user = session?.user;
   useAppTheme(Boolean(user));
   const admin = Boolean((user as { is_admin?: boolean } | undefined)?.is_admin);
-  const socialAccess = useSocialAccess(Boolean(user));
-  const clipperItems = NAV.map((item) => ({ ...item, label: t(`nav.${item.labelKey}`) })).filter((item) => !item.social || socialAccess === true);
+  const clipperItems = NAV.map((item) => ({ ...item, label: t(`nav.${item.labelKey}`) })).filter((item) => !item.social);
   const clipperActive = clipperItems.some((item) => item.match(pathname));
   const updatesActive = pathname.startsWith("/announcements") || pathname.startsWith("/messages");
   const [clipperOpen, setClipperOpen] = useState(true);
@@ -179,7 +174,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="mt-auto w-full space-y-2 pb-3 pt-3">
-          {!compact && billing?.monetization_enabled && <UsageCard billing={billing} />}
           <SidebarLink compact={compact} href="/refer" label="Refer & Earn" active={pathname.startsWith("/refer")}>
             <Gift className="size-4" />
           </SidebarLink>
@@ -252,43 +246,6 @@ function SidebarLink({ href, label, active, compact, shortcut, className, childr
   );
   if (!compact) return link;
   return <Tooltip><TooltipTrigger asChild>{link}</TooltipTrigger><TooltipContent side="right">{label}</TooltipContent></Tooltip>;
-}
-
-function UsageCard({ billing }: { billing: NonNullable<ReturnType<typeof useBillingSummary>[0]> }) {
-  const t = useTranslations("shell");
-  const tCommon = useTranslations("common");
-  const limit = billing.minute_limit ?? null;
-  const used = billing.usage_minutes ?? 0;
-  const pct = limit ? Math.min(100, (used / limit) * 100) : 0;
-  const upgrade = getUpgradeState(billing);
-  const nudge = !upgrade?.isPaid
-    ? t("usage.pickPlan")
-    : upgrade.nextPlan && (upgrade.atLimit || upgrade.nearLimit)
-    ? t("usage.moreWith", { name: tCommon(`plans.${billingPlanMessageKey(upgrade.nextPlan.id)}`) })
-    : null;
-  return (
-    <Link href="/settings#plan" className="group block rounded-xl border border-sidebar-border bg-background p-3 text-xs transition-colors hover:border-foreground/20">
-      <div className="flex items-center justify-between">
-        <span className="font-semibold">{tCommon(`plans.${billingPlanMessageKey(billing.plan)}`)}</span>
-        <span className="text-muted-foreground tabular-nums">
-          {limit ? t("usage.minutesOf", { used, limit }) : t("usage.minutes", { used })}
-        </span>
-      </div>
-      {limit ? (
-        <div className="mt-2 h-1 overflow-hidden rounded-full bg-muted">
-          <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
-        </div>
-      ) : null}
-      {nudge ? (
-        <p className="mt-2 flex items-center gap-1 font-medium text-foreground">
-          {nudge}
-          <ArrowRight className="ml-auto size-3 transition-transform group-hover:translate-x-0.5" />
-        </p>
-      ) : (
-        <p className="mt-2 text-muted-foreground">{limit && upgrade?.remaining !== null ? t("usage.minutesLeft", { count: upgrade?.remaining ?? 0 }) : t("usage.minutesThisMonth")}</p>
-      )}
-    </Link>
-  );
 }
 
 function UserRow({ compact, name, email }: { compact: boolean; name?: string | null; email?: string | null }) {
