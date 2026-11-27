@@ -12,7 +12,7 @@ async function signIn(page: import("@playwright/test").Page, email: string, pass
   await page.getByPlaceholder("Email").fill(email);
   await page.getByPlaceholder("Password").fill(password);
   await page.getByRole("button", { name: "Sign In" }).click();
-  await page.waitForURL("**/");
+  await page.waitForURL("**/dashboard");
 }
 
 test("regular user can browse seeded tasks and save preferences", async ({ page }) => {

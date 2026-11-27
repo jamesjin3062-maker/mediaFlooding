@@ -18,7 +18,7 @@ async function signIn(page: Page) {
   await page.getByPlaceholder("Email").fill(seed.regular.email);
   await page.getByPlaceholder("Password").fill(seed.regular.password);
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
-  await page.waitForURL("**/");
+  await page.waitForURL("**/dashboard");
 }
 async function waitForTask(page: Page, id: string) {
   await expect.poll(async () => {
@@ -177,7 +177,7 @@ test.describe("accounts and settings with real services", () => {
     await page.getByPlaceholder("Email").fill(email);
     await page.getByPlaceholder("Password").fill("LocalTestPassword123!");
     await page.getByRole("button", { name: "Sign Up", exact: true }).click();
-    await page.waitForURL("**/");
+    await page.waitForURL("**/dashboard");
     expect((await page.request.get("/api/preferences")).status()).toBe(200);
     await page.getByRole("button", { name: "Sign out", exact: true }).click();
     await page.waitForURL("**/sign-in");

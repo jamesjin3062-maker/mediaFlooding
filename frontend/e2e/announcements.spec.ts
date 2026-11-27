@@ -10,20 +10,22 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/api/announcements", route => route.fulfill({ json: { announcements: [creatorAnnouncement] } }));
 });
 
-test("landing announcement opens with the keyboard and remembers that it was read", async ({ page }) => {
-  await page.route("**/api/auth/get-session**", route => route.fulfill({ json: null }));
-  await page.goto("/");
-  const badge = page.getByRole("button", { name: "What's new, 1 unread announcement" });
-  await badge.focus();
+test("the notification bell opens with the keyboard and remembers that it was read", async ({ page }) => {
+  await page.route("**/api/auth/get-session**", route => route.fulfill({ json: {
+    session: { id: "session", userId: "announcement-user", expiresAt: "2099-01-01T00:00:00Z" },
+    user: { id: "announcement-user", name: "Alex", email: "alex@example.com", emailVerified: true },
+  } }));
+  await page.route("**/api/tasks/billing-summary", route => route.fulfill({ json: { monetization_enabled: false } }));
+  await page.route(/\/api\/tasks\/?(\?.*)?$/, route => route.fulfill({ json: { tasks: [] } }));
+  await page.goto("/list");
+  const bell = page.getByRole("button", { name: "Notifications, 1 unread" });
+  await bell.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "The creator program is open" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Explore the creator program" })).toHaveAttribute("href", "/affiliate");
+  await expect(page.getByText("The creator program is open", { exact: true })).toBeVisible();
   await page.screenshot({ animations: "disabled", path: "test-results/announcements-landing.png" });
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("button", { name: "What's new", exact: true })).toBeFocused();
-  await page.reload();
-  await expect(page.getByRole("button", { name: "What's new", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /unread announcement/ })).toHaveCount(0);
+  await page.getByRole("link", { name: /The creator program is open/ }).click();
+  await expect(page.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /unread/ })).toHaveCount(0);
 });
 
 test("in-app announcements work on desktop and mobile without covering the navigation", async ({ page }) => {
@@ -34,13 +36,13 @@ test("in-app announcements work on desktop and mobile without covering the navig
   await page.route("**/api/tasks/billing-summary", route => route.fulfill({ json: { monetization_enabled: false } }));
   await page.route(/\/api\/tasks\/?(\?.*)?$/, route => route.fulfill({ json: { tasks: [] } }));
   await page.goto("/list");
-  await page.getByRole("button", { name: /What's new, 1 unread announcement/ }).filter({ visible: true }).click();
-  await expect(page.getByRole("heading", { name: "The creator program is open" })).toBeVisible();
+  await page.getByRole("button", { name: "Notifications, 1 unread" }).filter({ visible: true }).click();
+  await expect(page.getByText("The creator program is open", { exact: true })).toBeVisible();
   await page.screenshot({ animations: "disabled", path: "test-results/announcements-app-desktop.png" });
   await page.keyboard.press("Escape");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole("button", { name: "What's new", exact: true }).filter({ visible: true }).click();
-  await expect(page.getByRole("heading", { name: "The creator program is open" })).toBeVisible();
+  await page.getByRole("button", { name: "Notifications, 1 unread" }).filter({ visible: true }).click();
+  await expect(page.getByText("The creator program is open", { exact: true })).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Mobile navigation" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ animations: "disabled", path: "test-results/announcements-app-mobile.png" });
@@ -74,10 +76,10 @@ test("admins create a draft, publish, edit and hide it through the announcements
   await page.getByLabel("Destination path", { exact: true }).fill("/settings");
   await page.getByRole("button", { name: "Save draft", exact: true }).click();
   await expect(page.getByText("Draft", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /unread announcement/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /unread/ })).toHaveCount(0);
   await page.getByRole("button", { name: "Publish", exact: true }).click();
   await expect(page.getByText("Published", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /1 unread announcement/ }).filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Notifications, 1 unread" }).filter({ visible: true })).toBeVisible();
   await page.getByRole("button", { name: "Edit", exact: true }).click();
   await page.getByLabel("Title", { exact: true }).fill("More caption styles");
   await page.getByRole("button", { name: "Save and publish", exact: true }).click();
@@ -85,6 +87,7 @@ test("admins create a draft, publish, edit and hide it through the announcements
   await page.screenshot({ animations: "disabled", path: "test-results/announcements-admin.png" });
   await page.getByRole("button", { name: "Hide", exact: true }).click();
   await expect(page.getByText("Draft", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /What's new/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /unread/ })).toHaveCount(0);
   expect(items[0]).toMatchObject({ id: "database-id", title: "More caption styles", isPublished: false });
 });
