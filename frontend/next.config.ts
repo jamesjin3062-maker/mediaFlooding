@@ -20,6 +20,18 @@ const posthogRewrites = isPostHogEnabled
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Dev throws away a compiled page after 60s, so a click after a pause builds it again.
+  onDemandEntries: {
+    maxInactiveAge: 60 * 60 * 1000,
+    pagesBufferLength: 50,
+  },
+  experimental: {
+    // Dynamic pages are not reused on the next click. Keep the last result for five minutes.
+    staleTimes: {
+      dynamic: 300,
+      static: 300,
+    },
+  },
   distDir: process.env.NEXT_BUILD_DIR || ".next",
   output: 'standalone',
   // Keep canonical tags in the initial <head>, including for Googlebot.

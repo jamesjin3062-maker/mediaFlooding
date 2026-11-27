@@ -219,14 +219,14 @@ function authHeaders(): HeadersInit | null {
   return { Authorization: `Bearer ${key}`, Accept: "application/json" };
 }
 
-const CLIPSTAKE_CACHE_MS = 60_000;
+const CLIPSTAKE_CACHE_MS = 5 * 60_000;
 const CLIPSTAKE_TIMEOUT_MS = 8_000;
 
 type CacheEntry = { expires: number; value: unknown };
 const clipstakeCache = new Map<string, CacheEntry>();
 const clipstakeInflight = new Map<string, Promise<unknown>>();
 
-/** Reuse a successful Clipstake response for a minute, and share one in-flight request. */
+/** Reuse a successful Clipstake response for five minutes, and share one in-flight request. */
 export function readClipstakeCache<T>(key: string, load: () => Promise<T>, keep: (value: T) => boolean): Promise<T> {
   const hit = clipstakeCache.get(key);
   if (hit && hit.expires > Date.now()) return Promise.resolve(hit.value as T);
