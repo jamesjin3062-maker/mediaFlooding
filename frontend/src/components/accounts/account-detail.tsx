@@ -39,6 +39,8 @@ function PostSummary({ post }: { post: InstagramPost }) {
   return (
     <>
       {post.thumbnail_url ? (
+        // Hosts come from the account provider, so this stays a plain image.
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={post.thumbnail_url} alt="" className="aspect-[4/5] w-full bg-muted object-cover" />
       ) : (
         <div className="flex aspect-[4/5] w-full items-center justify-center bg-muted text-xs text-muted-foreground">No preview</div>
