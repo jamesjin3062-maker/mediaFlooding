@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { FileText, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { calm } from "@/lib/calm-color";
+import { cn } from "@/lib/utils";
 
 const COUNTRIES = [
   "United States",
@@ -37,8 +39,8 @@ export function WalletBoard() {
     <main className="flex min-h-[calc(100dvh-3.5rem)] w-full flex-col px-4 py-6 sm:px-6 md:py-8">
       <h1 className="font-display text-2xl font-semibold tracking-tight">Wallet</h1>
 
-      <div className="mt-6 flex flex-col gap-3 rounded-xl border border-[oklch(0.45_0.04_95)] bg-[oklch(0.22_0.02_95)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-[oklch(0.9_0.03_95)]">Complete payout setup to withdraw.</p>
+      <div className={cn("mt-6 flex flex-col gap-3 rounded-xl px-4 py-3 sm:flex-row sm:items-center sm:justify-between", calm.sand.surface)}>
+        <p className="text-sm">Complete payout setup to withdraw.</p>
         <button
           type="button"
           onClick={() => setSetupOpen(true)}
@@ -49,9 +51,9 @@ export function WalletBoard() {
       </div>
 
       <Dialog open={setupOpen} onOpenChange={closeSetup}>
-        <DialogContent showCloseButton={false} className="max-w-3xl border-white/10 bg-black p-5 sm:min-h-80 sm:p-6">
+        <DialogContent showCloseButton={false} className="max-w-3xl p-5 sm:min-h-80 sm:p-6">
           <DialogTitle className="sr-only">Payout setup</DialogTitle>
-          <div className="flex items-start gap-2.5 rounded-xl border border-[oklch(0.62_0.11_85)] px-4 py-3 text-sm text-[oklch(0.84_0.12_92)]">
+          <div className={cn("flex items-start gap-2.5 rounded-xl px-4 py-3 text-sm", calm.sand.surface)}>
             <Info className="mt-0.5 size-4 shrink-0" />
             <p>Finish your payout setup — a few more details are needed before payouts can start.</p>
           </div>
@@ -62,12 +64,12 @@ export function WalletBoard() {
           >
             Finish setup
           </button>
-          <p className="mt-4 text-sm text-[oklch(0.62_0.01_260)]">
+          <p className="mt-4 text-sm text-muted-foreground">
             Not in {country}?{" "}
             <button
               type="button"
               onClick={() => setPickingCountry((open) => !open)}
-              className="text-[oklch(0.75_0.01_260)] hover:text-white"
+              className="text-foreground underline-offset-2 hover:underline"
             >
               Change country
             </button>
@@ -81,7 +83,7 @@ export function WalletBoard() {
                   setCountry(event.target.value);
                   setPickingCountry(false);
                 }}
-                className="mt-1.5 block h-9 rounded-lg border border-white/15 bg-black px-3 text-sm text-foreground"
+                className="mt-1.5 block h-9 rounded-lg border bg-background px-3 text-sm text-foreground"
               >
                 {COUNTRIES.map((name) => (
                   <option key={name} value={name}>
@@ -105,7 +107,7 @@ export function WalletBoard() {
           <p className="mt-2 font-display text-5xl font-semibold tabular-nums tracking-tight sm:text-6xl">$0.00</p>
         </div>
         <div className="text-left sm:text-right">
-          <button type="button" disabled className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-muted-foreground">
+          <button type="button" disabled className="inline-flex h-10 items-center gap-2 rounded-xl border bg-muted px-4 text-sm text-muted-foreground">
             Withdraw
           </button>
           <p className="mt-2 text-xs text-muted-foreground">Complete payout setup to withdraw.</p>
@@ -113,7 +115,7 @@ export function WalletBoard() {
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
-        <span className="flex size-10 items-center justify-center rounded-lg border border-white/15 text-muted-foreground">
+        <span className="flex size-10 items-center justify-center rounded-lg border text-muted-foreground">
           <FileText className="size-4" />
         </span>
         <p className="text-sm font-medium">No activity yet</p>

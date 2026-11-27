@@ -61,7 +61,7 @@ export function DashboardBoard({
           <p className="mt-2 font-display text-5xl font-semibold tabular-nums tracking-tight sm:text-6xl">$0.00</p>
           <p className="mt-2 text-sm text-muted-foreground">Earnings show here after a submitted clip has verified views.</p>
         </div>
-        <Link href="/wallet" className="inline-flex h-10 items-center rounded-xl border border-white/15 px-4 text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/wallet" className="inline-flex h-10 items-center rounded-xl border px-4 text-sm text-muted-foreground hover:bg-muted hover:text-foreground">
           Withdraw
         </Link>
       </div>
@@ -73,8 +73,8 @@ export function DashboardBoard({
       </dl>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.4fr_0.8fr]">
-        <section className="rounded-xl border border-white/15">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <section className="rounded-xl border">
+          <div className="flex items-center justify-between border-b px-4 py-3">
             <h2 className="font-display text-lg font-semibold">Campaigns</h2>
             <Link href="/campaigns" className="text-sm text-muted-foreground hover:text-foreground">See all</Link>
           </div>
@@ -86,8 +86,8 @@ export function DashboardBoard({
             {open.slice(0, 6).map((campaign) => {
               const pay = campaignPayLabel(campaign);
               return (
-                <li key={campaign.id} className="border-b border-white/10 last:border-b-0">
-                  <Link href={`/campaigns/${campaign.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03]">
+                <li key={campaign.id} className="border-b last:border-b-0">
+                  <Link href={`/campaigns/${campaign.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/70">
                     <CampaignMark name={campaign.brand_name} className="size-9 rounded-lg text-xs" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{campaign.name}</span>
@@ -101,10 +101,10 @@ export function DashboardBoard({
           </ul>
         </section>
 
-        <section className="flex min-h-64 flex-col rounded-xl border border-white/15">
-          <h2 className="border-b border-white/10 px-4 py-3 font-display text-lg font-semibold">Activity</h2>
+        <section className="flex min-h-64 flex-col rounded-xl border">
+          <h2 className="border-b px-4 py-3 font-display text-lg font-semibold">Activity</h2>
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-10 text-center">
-            <span className="flex size-10 items-center justify-center rounded-lg border border-white/15 text-muted-foreground">
+            <span className="flex size-10 items-center justify-center rounded-lg border text-muted-foreground">
               <FileText className="size-4" />
             </span>
             <p className="text-sm font-medium">No activity yet</p>
@@ -118,7 +118,7 @@ export function DashboardBoard({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/15 px-4 py-3">
+    <div className="rounded-xl border px-4 py-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
       <dd className="mt-1 font-display text-2xl font-semibold tabular-nums">{value}</dd>
     </div>

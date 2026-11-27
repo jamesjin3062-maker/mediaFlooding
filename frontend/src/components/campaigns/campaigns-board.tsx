@@ -40,7 +40,7 @@ export function CampaignsBoard({ initialList = null }: { initialList?: CampaignL
           Active campaigns
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">{active.length}</span>
         </h1>
-        <div className="mt-4 rounded-xl border border-white/15 p-4">
+        <div className="mt-4 rounded-xl border p-4">
           {active.length === 0 ? (
             <div className="flex h-24 flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
               <Megaphone className="size-4" />
